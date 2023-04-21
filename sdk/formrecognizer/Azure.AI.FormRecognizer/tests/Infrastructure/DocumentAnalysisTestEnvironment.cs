@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using Azure.Core.TestFramework;
 
 namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
@@ -108,5 +109,23 @@ namespace Azure.AI.FormRecognizer.DocumentAnalysis.Tests
         /// <returns>A URI to the specified file.</returns>
         public static Uri CreateUri(string filename) =>
             new Uri(CreateUriString(filename));
+
+        protected override async ValueTask<bool> IsEnvironmentReadyAsync()
+        {
+            var endpoint = new Uri(Endpoint);
+            var credential = new AzureKeyCredential(ApiKey);
+            var client = new DocumentModelAdministrationClient(endpoint, credential);
+
+            try
+            {
+                await client.GetDocumentModelAsync("prebuilt-layout");
+            }
+            catch (RequestFailedException ex) when (ex.Status == 401)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
