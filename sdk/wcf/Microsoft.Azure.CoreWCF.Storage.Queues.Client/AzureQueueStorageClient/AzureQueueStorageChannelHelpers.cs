@@ -4,8 +4,8 @@
 
 using System;
 using System.Globalization;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
+using CoreWCF;
+using CoreWCF.Channels;
 
 namespace Microsoft.ServiceModel.AQS
 {
