@@ -3,7 +3,7 @@
 //----------------------------------------------------------------
 
 using System;
-using CoreWCF.Channels;
+using System.ServiceModel.Channels;
 using System.Xml;
 
 namespace Microsoft.ServiceModel.AQS

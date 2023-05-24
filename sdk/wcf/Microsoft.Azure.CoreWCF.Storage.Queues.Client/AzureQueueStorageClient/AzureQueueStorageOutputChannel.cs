@@ -3,12 +3,13 @@
 //----------------------------------------------------------------
 
 using System;
-using CoreWCF;
-using CoreWCF.Channels;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 namespace Microsoft.ServiceModel.AQS
 {

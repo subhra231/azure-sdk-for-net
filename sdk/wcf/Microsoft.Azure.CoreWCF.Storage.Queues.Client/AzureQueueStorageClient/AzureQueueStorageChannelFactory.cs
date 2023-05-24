@@ -3,9 +3,10 @@
 //----------------------------------------------------------------
 
 using System;
-using CoreWCF.Channels;
+using System.Collections.ObjectModel;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Threading.Tasks;
-using CoreWCF;
 
 namespace Microsoft.ServiceModel.AQS
 {

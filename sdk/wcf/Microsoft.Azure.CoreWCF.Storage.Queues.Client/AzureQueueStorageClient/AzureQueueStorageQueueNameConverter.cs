@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
+using System.Net;
+using System.Security.Policy;
 using Azure.Storage.Queues;
 
 namespace Microsoft.ServiceModel.AQS
