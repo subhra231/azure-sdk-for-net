@@ -1,6 +1,5 @@
-﻿//----------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-//----------------------------------------------------------------
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
 using System.ServiceModel;
@@ -9,7 +8,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Storage.Queues;
-using Azure.Storage.Queues.Models;
 
 namespace Microsoft.ServiceModel.AQS
 {

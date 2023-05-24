@@ -1,9 +1,7 @@
-﻿//----------------------------------------------------------------
-// Copyright (c) Microsoft Corporation.  All rights reserved.
-//----------------------------------------------------------------
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
