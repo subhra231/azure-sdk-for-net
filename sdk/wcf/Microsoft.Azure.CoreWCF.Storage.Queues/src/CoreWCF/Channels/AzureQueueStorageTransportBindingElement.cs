@@ -82,7 +82,7 @@ namespace Azure.Storage.CoreWCF.Channels
         /// </summary>
         public override long MaxReceivedMessageSize
         {
-            get { return _maxReceivedMessageSize;  }
+            get { return _maxReceivedMessageSize; }
             set
             {
                 if (value < 0 || value > 8000L)
@@ -101,5 +101,15 @@ namespace Azure.Storage.CoreWCF.Channels
             get { return _receiveMessagevisibilityTimeout; }
             set { _receiveMessagevisibilityTimeout = value; }
         }
+
+        /// <summary>
+        /// Property to get and set Connection string of queue.
+        /// </summary>
+        public string ConnectionString { get; set; }
+
+        /// <summary>
+        /// Property to get and set name of queue.
+        /// </summary>
+        public string QueueName { get; set; }
     }
 }

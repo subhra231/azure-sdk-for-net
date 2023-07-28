@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net462;net6.0;net7.0</TargetFrameworks>
@@ -9,16 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\aqsEmptyTestMessage.bin" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Resources\aqsEmptyTestMessage.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\aqsTestMessage.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="IntegrationTests - Copy.cs" />
+    <Compile Remove="Startup - Copy.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" VersionOverride="3.1.13" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="NUnit" />
     <PackageReference Include="xunit.runner.visualstudio">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -38,11 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\storage\Azure.Storage.Common\tests\Azure.Storage.Common.Tests.csproj" />
     <ProjectReference Include="..\src\Azure.CoreWCF.AzureQueueStorage.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Fakes\" />
   </ItemGroup>
 
 </Project>

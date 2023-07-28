@@ -26,7 +26,8 @@ namespace Azure.Storage.CoreWCF.Channels
 
         public AzureQueueStorageQueueTransport(IServiceDispatcher serviceDispatcher, IServiceProvider serviceProvider, AzureQueueStorageTransportBindingElement azureQueueStorageTransportBindingElement)
         {
-            _queueClient = serviceProvider.GetRequiredService<MessageQueue>();
+            //_queueClient = serviceProvider.GetRequiredService<MessageQueue>(); //configure queue from connection string instead of getting from DI
+            _queueClient = new MessageQueue(azureQueueStorageTransportBindingElement.ConnectionString, azureQueueStorageTransportBindingElement.QueueName);
             _deadLetterQueueClient = serviceProvider.GetRequiredService<DeadLetterQueue>();
             _logger = serviceProvider.GetRequiredService<ILogger<AzureQueueStorageQueueTransport>>();
             _baseAddress = serviceDispatcher.BaseAddress;

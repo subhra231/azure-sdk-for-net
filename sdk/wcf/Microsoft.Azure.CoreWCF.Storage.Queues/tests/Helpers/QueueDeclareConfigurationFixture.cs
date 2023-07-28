@@ -3,7 +3,7 @@
 
 using Azure.Storage.CoreWCF.Channels;
 using Azure.Storage.Queues;
-using Xunit;
+using NUnit;
 
 namespace Azure.Storage.CoreWCF.AzureQueueStorage.Tests.Helpers
 {

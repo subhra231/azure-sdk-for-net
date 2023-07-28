@@ -3,11 +3,13 @@
 
 using Azure.Storage.CoreWCF.Channels;
 using Azure.Storage.Queues;
-using Xunit;
+using NUnit.Framework;
+using NUnit;
 
 namespace Azure.Storage.CoreWCF.AzureQueueStorage.Tests.Helpers
 {
-    public class AzureStorageQueueTests : IClassFixture<QueueDeclareConfigurationFixture>
+    [TestFixture]
+    public class AzureStorageQueueTests
     {
         public QueueDeclareConfigurationFixture _fixture;
 
@@ -16,28 +18,28 @@ namespace Azure.Storage.CoreWCF.AzureQueueStorage.Tests.Helpers
             _fixture = fixture;
         }
 
-        [Fact]
+        [Test]
         public void AzureQueueStorageBinding_MessageEncoding_IsText()
         {
-            Assert.Equal(AzureQueueStorageMessageEncoding.Text, _fixture.azureQueueStorageBinding.MessageEncoding);
+            Assert.Equals(AzureQueueStorageMessageEncoding.Text, _fixture.azureQueueStorageBinding.MessageEncoding);
         }
 
-        [Fact]
+        [Test]
         public void AzureQueueStorageBinding_Scheme()
         {
-            Assert.Equal("soap.aqs", _fixture.azureQueueStorageBinding.Scheme);
+            Assert.Equals("soap.aqs", _fixture.azureQueueStorageBinding.Scheme);
         }
 
-        [Fact]
+        [Test]
         public void AzureQueueStorageBinding_MessageSize()
         {
-            Assert.Equal(8000L, _fixture.azureQueueStorageBinding.MaxMessageSize);
+            Assert.Equals(8000L, _fixture.azureQueueStorageBinding.MaxMessageSize);
         }
 
-        [Fact]
+        [Test]
         public void AzureQueueStorageQueueNameConverter_GetEndpointUrl()
         {
-            Assert.Equal("net.aqs://account.queue.core.windows.net/Queue", AzureQueueStorageQueueNameConverter.GetEndpointUrl("account", "Queue"));
+            Assert.Equals("net.aqs://account.queue.core.windows.net/Queue", AzureQueueStorageQueueNameConverter.GetEndpointUrl("account", "Queue"));
         }
     }
 }
