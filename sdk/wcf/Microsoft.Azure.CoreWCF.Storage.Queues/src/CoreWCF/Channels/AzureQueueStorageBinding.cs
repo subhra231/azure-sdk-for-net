@@ -16,12 +16,16 @@ namespace Azure.Storage.CoreWCF.Channels
         private AzureQueueStorageTransportBindingElement _transport;
         private BinaryMessageEncodingBindingElement _binaryMessageEncodingBindingElement;
         private bool _isInitialized;
+        private string _connectionString;
+        private string _queueName;
 
         /// <summary>
         /// Constructor to initialize member variables.
         /// </summary>
-        public AzureQueueStorageBinding()
+        public AzureQueueStorageBinding(string connectionString, string queueName)
         {
+            _connectionString = connectionString;
+            _queueName = queueName;
             Initialize();
         }
 
@@ -32,6 +36,8 @@ namespace Azure.Storage.CoreWCF.Channels
         {
             //_transport.BrokerProtocol = BrokerProtocol;
             _transport.MaxReceivedMessageSize = TransportDefaults.DefaultMaxMessageSize;
+            _transport.ConnectionString = _connectionString;
+            _transport.QueueName = _queueName;
             BindingElementCollection elements = new BindingElementCollection();
 
             switch (MessageEncoding)

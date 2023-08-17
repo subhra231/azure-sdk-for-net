@@ -15,6 +15,12 @@ using Azure.Storage.CoreWCF.Channels;
 using Azure.Storage.Queues;
 using System.Collections.Generic;
 using System.Web.Services.Description;
+using QueuesClientBuilder = Azure.Storage.Test.Shared.ClientBuilder<
+    Azure.Storage.Queues.QueueServiceClient,
+    Azure.Storage.Queues.QueueClientOptions>;
+using Azure.Storage.Test.Shared;
+using static System.Net.WebRequestMethods;
+using System.Windows.Input;
 
 namespace CoreWCF.AzureQueueStorage.Tests
 {
@@ -38,15 +44,17 @@ namespace CoreWCF.AzureQueueStorage.Tests
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             DisposingQueue disposingQueue = app.ApplicationServices.GetRequiredService<DisposingQueue>();
+            QueuesClientBuilder clientBuilder = default;
+            string accountName = clientBuilder.Tenants.TestConfigDefault.AccountName;
+            string accountKey = clientBuilder.Tenants.TestConfigDefault.AccountKey;
+            string connectionString = $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accountKey}";
 
             app.UseServiceModel(services =>
             {
                 services.AddService<TestService>();
-                services.AddServiceEndpoint<TestService, ITestContract>(new AzureQueueStorageBinding(),
-                    ContrsuctURI(disposingQueue.Queue.Uri));
-   
+                services.AddServiceEndpoint<TestService, ITestContract>(new AzureQueueStorageBinding(connectionString, disposingQueue.Queue.Name),
+                   AzureQueueStorageQueueNameConverter.GetEndpointUrl(disposingQueue.Queue.AccountName, disposingQueue.Queue.Name));
             });
         }
+    }
 }
-
-

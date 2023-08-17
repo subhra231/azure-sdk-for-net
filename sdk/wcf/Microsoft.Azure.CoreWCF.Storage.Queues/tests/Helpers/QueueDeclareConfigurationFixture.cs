@@ -15,7 +15,7 @@ namespace Azure.Storage.CoreWCF.AzureQueueStorage.Tests.Helpers
 
         public QueueDeclareConfigurationFixture()
         {
-            azureQueueStorageBinding = new AzureQueueStorageBinding();
+            //azureQueueStorageBinding = new AzureQueueStorageBinding();
         }
     }
 }
