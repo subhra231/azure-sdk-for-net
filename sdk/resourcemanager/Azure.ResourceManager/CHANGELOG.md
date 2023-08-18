@@ -1,5 +1,22 @@
 # Release History
 
+## 1.8.0-beta.1 (Unreleased)
+
+### Features Added
+
+### Breaking Changes
+
+### Bugs Fixed
+
+### Other Changes
+
+## 1.7.0 (2023-07-13)
+
+### Other Changes
+
+- Bump api-version of `Subscription` to `2022-12-01`
+- Bump api-version of `Tenant` to `2022-12-01`
+
 ## 1.6.0 (2023-05-16)
 
 ### Features Added
