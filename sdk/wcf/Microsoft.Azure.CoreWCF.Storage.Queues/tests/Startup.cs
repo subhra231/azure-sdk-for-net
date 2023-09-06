@@ -3,24 +3,13 @@
 
 using System.Threading.Tasks;
 using Contracts;
-using CoreWCF.Channels;
 using CoreWCF.Configuration;
-using CoreWCF.AzureQueueStorage.Tests.Helpers;
-using CoreWCF.Queue.Common.Configuration;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using NUnit;
 using Azure.Storage.CoreWCF.Channels;
-using Azure.Storage.Queues;
-using System.Collections.Generic;
-using System.Web.Services.Description;
 using QueuesClientBuilder = Azure.Storage.Test.Shared.ClientBuilder<
-    Azure.Storage.Queues.QueueServiceClient,
-    Azure.Storage.Queues.QueueClientOptions>;
-using Azure.Storage.Test.Shared;
-using static System.Net.WebRequestMethods;
-using System.Windows.Input;
+        Azure.Storage.Queues.QueueServiceClient,
+        Azure.Storage.Queues.QueueClientOptions>;
 
 namespace CoreWCF.AzureQueueStorage.Tests
 {
@@ -41,7 +30,7 @@ namespace CoreWCF.AzureQueueStorage.Tests
             });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             DisposingQueue disposingQueue = app.ApplicationServices.GetRequiredService<DisposingQueue>();
             QueuesClientBuilder clientBuilder = default;
