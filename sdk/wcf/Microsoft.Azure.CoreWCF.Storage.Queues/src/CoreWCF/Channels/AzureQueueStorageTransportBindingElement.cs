@@ -10,7 +10,7 @@ using CoreWCF.Queue.Common.Configuration;
 namespace Azure.Storage.CoreWCF.Channels
 {
     /// <summary>
-    /// Class for the Queue binding element.
+    /// Class that represents Azure Queue Storage transport binding element.
     /// </summary>
     public class AzureQueueStorageTransportBindingElement : QueueBaseTransportBindingElement
     {
@@ -18,14 +18,14 @@ namespace Azure.Storage.CoreWCF.Channels
         private TimeSpan _receiveMessagevisibilityTimeout = TransportDefaults.ReceiveMessagevisibilityTimeout;
 
         /// <summary>
-        /// Creates a new instance of the AzureQueueStorageTransportBindingElement Class using the default protocol.
+        /// Creates a new instance of the AzureQueueStorageTransportBindingElement Class.
         /// </summary>
         public AzureQueueStorageTransportBindingElement()
         {
         }
 
         /// <summary>
-        /// Constructor to initialize member variables.
+        /// Creates a new instance of this class from an existing instance.
         /// </summary>
         protected AzureQueueStorageTransportBindingElement(AzureQueueStorageTransportBindingElement other) : base(other)
         {
@@ -33,7 +33,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// overridden method to clone binding element.
+        /// Overridden method to return a copy of the binding AzureQueueStorageTransportBindingElement object.
         /// </summary>
         public override BindingElement Clone()
         {
@@ -41,13 +41,13 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Return property of Binding Context.
+        /// Gets a property from the specified BindingContext.
         /// </summary>
         public override T GetProperty<T>(BindingContext context)
         {
             if (context == null)
             {
-                //throw DiagnosticUtility.ExceptionUtility.ThrowHelperArgumentNull(nameof(context));
+                throw new ArgumentNullException(nameof(context));
             }
 
             return base.GetProperty<T>(context);
@@ -70,7 +70,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Gets the scheme used by the binding, soap.amqp
+        /// Gets the URI scheme for the transport.
         /// </summary>
         public override string Scheme
         {
@@ -78,7 +78,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// The largest receivable encoded message
+        /// Gets or sets the maximum allowable message size, in bytes, that can be received.
         /// </summary>
         public override long MaxReceivedMessageSize
         {
@@ -94,7 +94,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Property to set the receive Message Visibility Timeout for the queue.
+        /// Gets or Sets the receive Message Visibility Timeout for the queue.
         /// </summary>
         public TimeSpan MaxReceivedTimeout
         {
@@ -103,12 +103,12 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Property to get and set Connection string of queue.
+        /// Gets or sets the connection string of Azure queue Storage.
         /// </summary>
         public string ConnectionString { get; set; }
 
         /// <summary>
-        /// Property to get and set name of queue.
+        /// Gets or sets name of Azure queue Storage.
         /// </summary>
         public string QueueName { get; set; }
     }

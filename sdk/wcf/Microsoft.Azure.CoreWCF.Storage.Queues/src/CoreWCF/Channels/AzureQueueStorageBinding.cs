@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-using System.Net;
-using Azure.Storage.Queues;
 using CoreWCF.Channels;
 
 namespace Azure.Storage.CoreWCF.Channels
 {
     /// <summary>
-    /// The class storing binding information
+    /// The class that contains the binding elements that specify the protocols, transports,
+    /// and message encoders used for communication between clients and services.
     /// </summary>
     public class AzureQueueStorageBinding : Binding
     {
@@ -20,7 +19,7 @@ namespace Azure.Storage.CoreWCF.Channels
         private string _queueName;
 
         /// <summary>
-        /// Constructor to initialize member variables.
+        /// Initializes a new instance of the AzureQueueStorageBinding class with the specified parameters.
         /// </summary>
         public AzureQueueStorageBinding(string connectionString, string queueName)
         {
@@ -30,7 +29,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Method to create Binding elements
+        /// Overidden method to create a collection that contains the binding elements that are part of the current binding.
         /// </summary>
         public override BindingElementCollection CreateBindingElements()
         {
@@ -71,7 +70,8 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Gets the scheme used by the binding, soap.amqp
+        /// Gets the URI scheme that specifies the transport used by the channel and listener
+        /// factories that are built by the bindings.
         /// </summary>
         public override string Scheme
         {
@@ -79,7 +79,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Specifies the maximum encoded message size
+        /// Gets or sets the maximum encoded message size.
         /// </summary>
         public long MaxMessageSize
         {
@@ -88,7 +88,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Sets the message encoding.
+        /// Gets and sets the message encoding.
         /// </summary>
         public AzureQueueStorageMessageEncoding MessageEncoding { get; set; } = AzureQueueStorageMessageEncoding.Text;
     }

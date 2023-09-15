@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure;
-using Azure.Storage.Queues;
-using Azure.Storage.Queues.Models;
 
 namespace Azure.Storage.CoreWCF.Channels
 {

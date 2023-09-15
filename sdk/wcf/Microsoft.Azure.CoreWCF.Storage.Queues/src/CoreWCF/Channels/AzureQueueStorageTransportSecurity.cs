@@ -2,9 +2,6 @@
 // Licensed under the MIT License.
 
 using System;
-using System.Security.Authentication.ExtendedProtection;
-using System.Net;
-using System.Threading;
 
 namespace Azure.Storage.CoreWCF.Channels
 {
@@ -20,7 +17,7 @@ namespace Azure.Storage.CoreWCF.Channels
         private string _queueName;
 
         /// <summary>
-        /// The Constructor for AzureQueueStorageTransportSecurity class.
+        /// Creates an instance of the AzureQueueStorageTransportSecurity class with the provided parameters.
         /// </summary>
         public AzureQueueStorageTransportSecurity(string connectionString, string queueName)
         {
@@ -30,7 +27,7 @@ namespace Azure.Storage.CoreWCF.Channels
         }
 
         /// <summary>
-        /// Represents the type of credential used by the Azure Queue Storage client.
+        /// Gets or sets the type of credential used by the Azure Queue Storage client.
         /// </summary>
         public AzureQueueStorageCredentialType ClientCredentialType
         {

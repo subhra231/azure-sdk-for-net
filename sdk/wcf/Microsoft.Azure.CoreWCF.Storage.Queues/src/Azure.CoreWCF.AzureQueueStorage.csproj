@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.Storage.Queues" />
     <PackageReference Include="System.IO.Pipelines" VersionOverride="6.0.3" />
-    <PackageReference Include="CoreWCF.Queue" VersionOverride="1.4.0-preview1" />
+    <PackageReference Include="CoreWCF.Queue" VersionOverride="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>
