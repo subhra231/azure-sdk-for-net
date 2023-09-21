@@ -5,22 +5,32 @@ using Azure.Storage.CoreWCF.Channels;
 using Azure.Storage.Queues;
 using Contracts;
 using CoreWCF.Configuration;
+using CoreWCF.Queue.Common.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace CoreWCF.AzureQueueStorage.Tests
 {
     public class Startup
     {
         private readonly string queueName = "queue-name";
-        private readonly string connectionString = "DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=https://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=https://127.0.0.1:10001/devstoreaccount1;";
+        private string connectionString = null;
+        private string endpointUrlString = null;
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<TestService>();
             services.AddServiceModelServices();
-
-            var queueClient = new QueueClient(connectionString, queueName);
-            queueClient.Create();
+            services.AddQueueTransport();
+            var azuriteFixture = AzuriteNUnitFixture.Instance;
+            var transport = azuriteFixture.GetTransport();
+            connectionString = azuriteFixture.GetAzureAccount().ConnectionString;
+            var endpointUriBuilder = new UriBuilder(azuriteFixture.GetAzureAccount().QueueEndpoint + "/" + queueName);
+            endpointUriBuilder.Scheme = "net.aqs";
+            endpointUrlString = endpointUriBuilder.Uri.AbsoluteUri;
+            var queueClient = new QueueClient(connectionString, queueName, new QueueClientOptions { Transport = transport });
+            queueClient.CreateIfNotExists();
             services.AddSingleton(queueClient);
         }
 
@@ -32,7 +42,7 @@ namespace CoreWCF.AzureQueueStorage.Tests
             {
                 services.AddService<TestService>();
                 services.AddServiceEndpoint<TestService, ITestContract>(new AzureQueueStorageBinding(connectionString, queueName),
-                   AzureQueueStorageQueueNameConverter.GetEndpointUrl("devstoreaccount1" , queueName));
+                   endpointUrlString);
             });
         }
     }

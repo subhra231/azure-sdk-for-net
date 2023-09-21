@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace CoreWCF.AzureQueueStorage.Tests
 {
-    [TestFixture]
     public class IntegrationTests
     {
         private IWebHost host;
