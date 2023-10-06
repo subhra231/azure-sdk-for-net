@@ -3,9 +3,7 @@
 Run `dotnet build /t:GenerateCode` to generate code.
 
 ``` yaml
-
 azure-arm: true
-generate-model-factory: false
 csharp: true
 library-name: Workloads
 namespace: Azure.ResourceManager.Workloads
@@ -13,6 +11,12 @@ require: https://github.com/Azure/azure-rest-api-specs/blob/c9a6e0a98a51ebc0c7a3
 tag: package-2023-04
 output-folder: $(this-folder)/Generated
 clear-output-folder: true
+sample-gen:
+  output-folder: $(this-folder)/../samples/Generated
+  clear-output-folder: true
+  skipped-operations:
+  - monitors_Update
+  - SAPVirtualInstances_Update
 skip-csproj: true
 modelerfour:
   flatten-payloads: false
@@ -29,7 +33,7 @@ format-by-name-rules:
   '*Uri': 'Uri'
   '*Uris': 'Uri'
 
-rename-rules:
+acronym-mapping:
   CPU: Cpu
   CPUs: Cpus
   Os: OS

@@ -4,9 +4,6 @@
 #nullable disable
 
 using System;
-using System.Collections.Specialized;
-using System.IO;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Core;
@@ -14,20 +11,13 @@ using Azure.Core.Pipeline;
 
 namespace Azure.AI.OpenAI
 {
-    /// <summary> Azure OpenAI APIs for completions and search. </summary>
-    [CodeGenSuppress("GetCompletions", typeof(string), typeof(RequestContent), typeof(RequestContext))]
-    [CodeGenSuppress("GetCompletionsAsync", typeof(string), typeof(RequestContent), typeof(RequestContext))]
-    [CodeGenSuppress("GetEmbeddings", typeof(string), typeof(RequestContent), typeof(RequestContext))]
-    [CodeGenSuppress("GetEmbeddingsAsync", typeof(string), typeof(RequestContent), typeof(RequestContext))]
-    [CodeGenSuppress("CreateGetCompletionsRequest", typeof(string), typeof(RequestContent), typeof(RequestContext))]
-    [CodeGenSuppress("CreateGetEmbeddingsRequest", typeof(string), typeof(RequestContent), typeof(RequestContext))]
     public partial class OpenAIClient
     {
         private const int DefaultMaxCompletionsTokens = 100;
         private const string PublicOpenAIApiVersion = "1";
         private const string PublicOpenAIEndpoint = $"https://api.openai.com/v{PublicOpenAIApiVersion}";
 
-        private readonly string _nonAzureOpenAIApiKey;
+        private bool _isConfiguredForAzureOpenAI = true;
 
         /// <summary>
         ///     Initializes a instance of OpenAIClient for use with an Azure OpenAI resource.
@@ -93,7 +83,13 @@ namespace Azure.AI.OpenAI
 
             ClientDiagnostics = new ClientDiagnostics(options, true);
             _tokenCredential = tokenCredential;
-            _pipeline = HttpPipelineBuilder.Build(options, Array.Empty<HttpPipelinePolicy>(), new HttpPipelinePolicy[] { new BearerTokenAuthenticationPolicy(_tokenCredential, AuthorizationScopes) }, new ResponseClassifier());
+            _pipeline = HttpPipelineBuilder.Build(
+                options,
+                Array.Empty<HttpPipelinePolicy>(),
+                new HttpPipelinePolicy[] {
+                    new BearerTokenAuthenticationPolicy(_tokenCredential, AuthorizationScopes)
+                },
+                new ResponseClassifier());
             _endpoint = endpoint;
             _apiVersion = options.Version;
         }
@@ -120,14 +116,14 @@ namespace Azure.AI.OpenAI
         public OpenAIClient(string openAIApiKey, OpenAIClientOptions options)
             : this(new Uri(PublicOpenAIEndpoint), CreateDelegatedToken(openAIApiKey), options)
         {
-            _nonAzureOpenAIApiKey = openAIApiKey;
+            _isConfiguredForAzureOpenAI = false;
         }
 
         /// <inheritdoc cref="OpenAIClient(string, OpenAIClientOptions)"/>
         public OpenAIClient(string openAIApiKey)
             : this(new Uri(PublicOpenAIEndpoint), CreateDelegatedToken(openAIApiKey), new OpenAIClientOptions())
         {
-            _nonAzureOpenAIApiKey = openAIApiKey;
+            _isConfiguredForAzureOpenAI = false;
         }
 
         /// <summary> Return textual completions as configured for a given prompt. </summary>
@@ -150,13 +146,11 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(completionsOptions, nameof(completionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                completionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetCompletions");
             scope.Start();
+
+            completionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            completionsOptions.InternalShouldStreamResponse = null;
 
             RequestContent content = completionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -194,13 +188,11 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(completionsOptions, nameof(completionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                completionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetCompletions");
             scope.Start();
+
+            completionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            completionsOptions.InternalShouldStreamResponse = null;
 
             RequestContent content = completionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -257,16 +249,13 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(completionsOptions, nameof(completionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                completionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetCompletionsStreaming");
             scope.Start();
 
-            RequestContent nonStreamingContent = completionsOptions.ToRequestContent();
-            RequestContent streamingContent = GetStreamingEnabledRequestContent(nonStreamingContent);
+            completionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            completionsOptions.InternalShouldStreamResponse = true;
+
+            RequestContent content = completionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
 
             try
@@ -275,7 +264,7 @@ namespace Azure.AI.OpenAI
                 HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
                     "completions",
-                    streamingContent,
+                    content,
                     context);
                 message.BufferResponse = false;
                 Response baseResponse = _pipeline.ProcessMessage(message, context, cancellationToken);
@@ -297,18 +286,14 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(completionsOptions, nameof(completionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                completionsOptions.NonAzureModel = deploymentOrModelName;
-            }
+            completionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            completionsOptions.InternalShouldStreamResponse = true;
 
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetCompletionsStreaming");
             scope.Start();
 
+            RequestContent content = completionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
-
-            RequestContent nonStreamingContent = completionsOptions.ToRequestContent();
-            RequestContent streamingContent = GetStreamingEnabledRequestContent(nonStreamingContent);
 
             try
             {
@@ -316,7 +301,7 @@ namespace Azure.AI.OpenAI
                 HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
                     "completions",
-                    streamingContent,
+                    content,
                     context);
                 message.BufferResponse = false;
                 Response baseResponse = await _pipeline.ProcessMessageAsync(message, context, cancellationToken)
@@ -349,13 +334,13 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(chatCompletionsOptions, nameof(chatCompletionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                chatCompletionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
-            using var scope = ClientDiagnostics.CreateScope("OpenAIClient.GetChatCompletions");
+            using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetChatCompletions");
             scope.Start();
+
+            chatCompletionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            chatCompletionsOptions.InternalShouldStreamResponse = null;
+
+            string operationPath = GetOperationPath(chatCompletionsOptions);
 
             RequestContent content = chatCompletionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -364,7 +349,7 @@ namespace Azure.AI.OpenAI
             {
                 using HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
-                    "chat/completions",
+                    operationPath,
                     content,
                     context);
                 Response response = _pipeline.ProcessMessage(message, context, cancellationToken);
@@ -386,13 +371,13 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(chatCompletionsOptions, nameof(chatCompletionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                chatCompletionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetChatCompletions");
             scope.Start();
+
+            chatCompletionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            chatCompletionsOptions.InternalShouldStreamResponse = null;
+
+            string operationPath = GetOperationPath(chatCompletionsOptions);
 
             RequestContent content = chatCompletionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -401,7 +386,7 @@ namespace Azure.AI.OpenAI
             {
                 using HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
-                    "chat/completions",
+                    operationPath,
                     content,
                     context);
                 Response response = await _pipeline.ProcessMessageAsync(message, context, cancellationToken)
@@ -443,16 +428,15 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(chatCompletionsOptions, nameof(chatCompletionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                chatCompletionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetChatCompletionsStreaming");
             scope.Start();
 
-            RequestContent nonStreamingContent = chatCompletionsOptions.ToRequestContent();
-            RequestContent streamingContent = GetStreamingEnabledRequestContent(nonStreamingContent);
+            chatCompletionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            chatCompletionsOptions.InternalShouldStreamResponse = true;
+
+            string operationPath = GetOperationPath(chatCompletionsOptions);
+
+            RequestContent content = chatCompletionsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
 
             try
@@ -460,8 +444,8 @@ namespace Azure.AI.OpenAI
                 // Response value object takes IDisposable ownership of message
                 HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
-                    "chat/completions",
-                    streamingContent,
+                    operationPath,
+                    content,
                     context);
                 message.BufferResponse = false;
                 Response baseResponse = _pipeline.ProcessMessage(message, context, cancellationToken);
@@ -483,26 +467,24 @@ namespace Azure.AI.OpenAI
             Argument.AssertNotNull(deploymentOrModelName, nameof(deploymentOrModelName));
             Argument.AssertNotNull(chatCompletionsOptions, nameof(chatCompletionsOptions));
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                chatCompletionsOptions.NonAzureModel = deploymentOrModelName;
-            }
-
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetChatCompletionsStreaming");
             scope.Start();
 
-            RequestContext context = FromCancellationToken(cancellationToken);
+            chatCompletionsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
+            chatCompletionsOptions.InternalShouldStreamResponse = true;
 
-            RequestContent nonStreamingContent = chatCompletionsOptions.ToRequestContent();
-            RequestContent streamingContent = GetStreamingEnabledRequestContent(nonStreamingContent);
+            string operationPath = GetOperationPath(chatCompletionsOptions);
+
+            RequestContent content = chatCompletionsOptions.ToRequestContent();
+            RequestContext context = FromCancellationToken(cancellationToken);
 
             try
             {
                 // Response value object takes IDisposable ownership of message
                 HttpMessage message = CreatePostRequestMessage(
                     deploymentOrModelName,
-                    "chat/completions",
-                    streamingContent,
+                    operationPath,
+                    content,
                     context);
                 message.BufferResponse = false;
                 Response baseResponse = await _pipeline.ProcessMessageAsync(
@@ -543,10 +525,7 @@ namespace Azure.AI.OpenAI
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetEmbeddings");
             scope.Start();
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                embeddingsOptions.NonAzureModel = deploymentOrModelName;
-            }
+            embeddingsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
 
             RequestContent content = embeddingsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -576,10 +555,7 @@ namespace Azure.AI.OpenAI
             using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetEmbeddings");
             scope.Start();
 
-            if (!string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
-            {
-                embeddingsOptions.NonAzureModel = deploymentOrModelName;
-            }
+            embeddingsOptions.InternalNonAzureModelName = _isConfiguredForAzureOpenAI ? null : deploymentOrModelName;
 
             RequestContent content = embeddingsOptions.ToRequestContent();
             RequestContext context = FromCancellationToken(cancellationToken);
@@ -598,40 +574,288 @@ namespace Azure.AI.OpenAI
             }
         }
 
-        private static RequestContent GetStreamingEnabledRequestContent(RequestContent originalRequestContent)
+        /// <summary>
+        ///     Get a set of generated images influenced by a provided textual prompt.
+        /// </summary>
+        /// <param name="imageGenerationOptions">
+        ///     The configuration information for the image generation request that controls the content,
+        ///     size, and other details about generated images.
+        /// </param>
+        /// <param name="cancellationToken">
+        ///     An optional cancellation token that may be used to abort an ongoing request.
+        /// </param>
+        /// <returns>
+        ///     The response information for the image generations request.
+        /// </returns>
+        public virtual Response<ImageGenerations> GetImageGenerations(
+            ImageGenerationOptions imageGenerationOptions,
+            CancellationToken cancellationToken = default)
         {
-            // Dump the original request content to a temporary stream and seek to start
-            using Stream originalRequestContentStream = new MemoryStream();
-            originalRequestContent.WriteTo(originalRequestContentStream, new CancellationToken());
-            originalRequestContentStream.Position = 0;
+            Argument.AssertNotNull(imageGenerationOptions, nameof(imageGenerationOptions));
 
-            JsonDocument originalJson = JsonDocument.Parse(originalRequestContentStream);
-            JsonElement originalJsonRoot = originalJson.RootElement;
+            using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetImageGenerations");
+            scope.Start();
 
-            var augmentedContent = new Utf8JsonRequestContent();
-            augmentedContent.JsonWriter.WriteStartObject();
-
-            // Copy the original JSON content back into the new copy
-            foreach (JsonProperty jsonThing in originalJsonRoot.EnumerateObject())
+            try
             {
-                augmentedContent.JsonWriter.WritePropertyName(jsonThing.Name);
-                jsonThing.Value.WriteTo(augmentedContent.JsonWriter);
+                Response rawResponse = default;
+                ImageGenerations responseValue = default;
+
+                if (_isConfiguredForAzureOpenAI)
+                {
+                    Operation<BatchImageGenerationOperationResponse> imagesOperation
+                        = BeginAzureBatchImageGeneration(
+                            WaitUntil.Completed,
+                            imageGenerationOptions,
+                            cancellationToken);
+
+                    rawResponse = imagesOperation.GetRawResponse();
+                    BatchImageGenerationOperationResponse operationResponse = imagesOperation.Value;
+
+                    responseValue = operationResponse.Result;
+                }
+                else
+                {
+                    RequestContext context = FromCancellationToken(cancellationToken);
+                    HttpMessage message = CreatePostRequestMessage(
+                        string.Empty,
+                        "images/generations",
+                        content: imageGenerationOptions.ToRequestContent(),
+                        context);
+                    rawResponse = _pipeline.ProcessMessage(message, context, cancellationToken);
+                    responseValue = ImageGenerations.FromResponse(rawResponse);
+                }
+                return Response.FromValue(responseValue, rawResponse);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///     Get a set of generated images influenced by a provided textual prompt.
+        /// </summary>
+        /// <param name="imageGenerationOptions">
+        ///     The configuration information for the image generation request that controls the content,
+        ///     size, and other details about generated images.
+        /// </param>
+        /// <param name="cancellationToken">
+        ///     An optional cancellation token that may be used to abort an ongoing request.
+        /// </param>
+        /// <returns>
+        ///     The response information for the image generations request.
+        /// </returns>
+        public virtual async Task<Response<ImageGenerations>> GetImageGenerationsAsync(
+            ImageGenerationOptions imageGenerationOptions,
+            CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNull(imageGenerationOptions, nameof(imageGenerationOptions));
+
+            using DiagnosticScope scope = ClientDiagnostics.CreateScope("OpenAIClient.GetImageGenerations");
+            scope.Start();
+
+            try
+            {
+                Response rawResponse = default;
+                ImageGenerations responseValue = default;
+
+                if (_isConfiguredForAzureOpenAI)
+                {
+                    Operation<BatchImageGenerationOperationResponse> imagesOperation
+                        = await BeginAzureBatchImageGenerationAsync(
+                            WaitUntil.Completed,
+                            imageGenerationOptions,
+                            cancellationToken)
+                        .ConfigureAwait(false);
+
+                    rawResponse = imagesOperation.GetRawResponse();
+                    BatchImageGenerationOperationResponse operationResponse = imagesOperation.Value;
+
+                    responseValue = operationResponse.Result;
+                }
+                else
+                {
+                    RequestContext context = FromCancellationToken(cancellationToken);
+                    HttpMessage message = CreatePostRequestMessage(
+                        string.Empty,
+                        "images/generations",
+                        content: imageGenerationOptions.ToRequestContent(),
+                        context);
+                    rawResponse = await _pipeline.ProcessMessageAsync(message, context, cancellationToken)
+                        .ConfigureAwait(false);
+                    responseValue = ImageGenerations.FromResponse(rawResponse);
+                }
+                return Response.FromValue(responseValue, rawResponse);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+        }
+
+        /// <summary> Transcribes audio into the input language. </summary>
+        /// <param name="deploymentId"> Specifies either the model deployment name (when using Azure OpenAI) or model name (when using non-Azure OpenAI) to use for this request. </param>
+        /// <param name="audioTranscriptionOptions">
+        /// Transcription request.
+        /// Requesting format 'json' will result on only the 'text' field being set.
+        /// For more output data use 'verbose_json.
+        /// </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="deploymentId"/> or <paramref name="audioTranscriptionOptions"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="deploymentId"/> is an empty string, and was expected to be non-empty. </exception>
+        public virtual async Task<Response<AudioTranscription>> GetAudioTranscriptionAsync(string deploymentId, AudioTranscriptionOptions audioTranscriptionOptions, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(deploymentId, nameof(deploymentId));
+            Argument.AssertNotNull(audioTranscriptionOptions, nameof(audioTranscriptionOptions));
+
+            using var scope = ClientDiagnostics.CreateScope("OpenAIClient.GetAudioTranscription");
+            scope.Start();
+
+            audioTranscriptionOptions.InternalNonAzureModelName = deploymentId;
+
+            RequestContent content = audioTranscriptionOptions.ToRequestContent();
+            RequestContext context = FromCancellationToken(cancellationToken);
+            Response rawResponse = default;
+
+            try
+            {
+                using HttpMessage message = CreateGetAudioTranscriptionRequest(deploymentId, content, context);
+                rawResponse = await _pipeline.ProcessMessageAsync(message, context).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
             }
 
-            // ...Add the *one thing* we wanted to add
-            augmentedContent.JsonWriter.WritePropertyName("stream");
-            augmentedContent.JsonWriter.WriteBooleanValue(true);
+            return Response.FromValue(AudioTranscription.FromResponse(rawResponse), rawResponse);
+        }
 
-            augmentedContent.JsonWriter.WriteEndObject();
+        /// <summary> Transcribes audio into the input language. </summary>
+        /// <param name="deploymentId"> Specifies either the model deployment name (when using Azure OpenAI) or model name (when using non-Azure OpenAI) to use for this request. </param>
+        /// <param name="audioTranscriptionOptions">
+        /// Transcription request.
+        /// Requesting format 'json' will result on only the 'text' field being set.
+        /// For more output data use 'verbose_json.
+        /// </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="deploymentId"/> or <paramref name="audioTranscriptionOptions"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="deploymentId"/> is an empty string, and was expected to be non-empty. </exception>
+        public virtual Response<AudioTranscription> GetAudioTranscription(string deploymentId, AudioTranscriptionOptions audioTranscriptionOptions, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(deploymentId, nameof(deploymentId));
+            Argument.AssertNotNull(audioTranscriptionOptions, nameof(audioTranscriptionOptions));
 
-            return augmentedContent;
+            using var scope = ClientDiagnostics.CreateScope("OpenAIClient.GetAudioTranscription");
+            scope.Start();
+
+            audioTranscriptionOptions.InternalNonAzureModelName = deploymentId;
+
+            RequestContent content = audioTranscriptionOptions.ToRequestContent();
+            RequestContext context = FromCancellationToken(cancellationToken);
+            Response rawResponse = default;
+
+            try
+            {
+                using HttpMessage message = CreateGetAudioTranscriptionRequest(deploymentId, content, context);
+                rawResponse = _pipeline.ProcessMessage(message, context);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+
+            return Response.FromValue(AudioTranscription.FromResponse(rawResponse), rawResponse);
+        }
+
+        /// <summary> Transcribes and translates input audio into English text. </summary>
+        /// <param name="deploymentId"> Specifies either the model deployment name (when using Azure OpenAI) or model name (when using non-Azure OpenAI) to use for this request. </param>
+        /// <param name="audioTranslationOptions">
+        /// Translation request.
+        /// Requesting format 'json' will result on only the 'text' field being set.
+        /// For more output data use 'verbose_json.
+        /// </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="deploymentId"/> or <paramref name="audioTranslationOptions"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="deploymentId"/> is an empty string, and was expected to be non-empty. </exception>
+        public virtual async Task<Response<AudioTranslation>> GetAudioTranslationAsync(string deploymentId, AudioTranslationOptions audioTranslationOptions, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(deploymentId, nameof(deploymentId));
+            Argument.AssertNotNull(audioTranslationOptions, nameof(audioTranslationOptions));
+
+            // Custom code: merely linking the deployment ID (== model name) into the request body for non-Azure use
+            audioTranslationOptions.InternalNonAzureModelName = deploymentId;
+
+            using var scope = ClientDiagnostics.CreateScope("OpenAIClient.GetAudioTranslation");
+            scope.Start();
+
+            audioTranslationOptions.InternalNonAzureModelName = deploymentId;
+
+            RequestContent content = audioTranslationOptions.ToRequestContent();
+            RequestContext context = FromCancellationToken(cancellationToken);
+            Response rawResponse = default;
+
+            try
+            {
+                using HttpMessage message = CreateGetAudioTranslationRequest(deploymentId, content, context);
+                rawResponse = await _pipeline.ProcessMessageAsync(message, context).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+
+            return Response.FromValue(AudioTranslation.FromResponse(rawResponse), rawResponse);
+        }
+
+        /// <summary> Transcribes and translates input audio into English text. </summary>
+        /// <param name="deploymentId"> Specifies either the model deployment name (when using Azure OpenAI) or model name (when using non-Azure OpenAI) to use for this request. </param>
+        /// <param name="audioTranslationOptions">
+        /// Translation request.
+        /// Requesting format 'json' will result on only the 'text' field being set.
+        /// For more output data use 'verbose_json.
+        /// </param>
+        /// <param name="cancellationToken"> The cancellation token to use. </param>
+        /// <exception cref="ArgumentNullException"> <paramref name="deploymentId"/> or <paramref name="audioTranslationOptions"/> is null. </exception>
+        /// <exception cref="ArgumentException"> <paramref name="deploymentId"/> is an empty string, and was expected to be non-empty. </exception>
+        public virtual Response<AudioTranslation> GetAudioTranslation(string deploymentId, AudioTranslationOptions audioTranslationOptions, CancellationToken cancellationToken = default)
+        {
+            Argument.AssertNotNullOrEmpty(deploymentId, nameof(deploymentId));
+            Argument.AssertNotNull(audioTranslationOptions, nameof(audioTranslationOptions));
+
+            using var scope = ClientDiagnostics.CreateScope("OpenAIClient.GetAudioTranslation");
+            scope.Start();
+
+            audioTranslationOptions.InternalNonAzureModelName = deploymentId;
+
+            RequestContent content = audioTranslationOptions.ToRequestContent();
+            RequestContext context = FromCancellationToken(cancellationToken);
+            Response rawResponse = default;
+
+            try
+            {
+                using HttpMessage message = CreateGetAudioTranslationRequest(deploymentId, content, context);
+                rawResponse = _pipeline.ProcessMessage(message, context);
+            }
+            catch (Exception e)
+            {
+                scope.Failed(e);
+                throw;
+            }
+
+            return Response.FromValue(AudioTranslation.FromResponse(rawResponse), rawResponse);
         }
 
         internal RequestUriBuilder GetUri(string deploymentOrModelName, string operationPath)
         {
             var uri = new RawRequestUriBuilder();
             uri.Reset(_endpoint);
-            if (string.IsNullOrEmpty(_nonAzureOpenAIApiKey))
+            if (_isConfiguredForAzureOpenAI)
             {
                 uri.AppendRaw("/openai", false);
                 uri.AppendPath("/deployments/", false);
@@ -664,7 +888,7 @@ namespace Azure.AI.OpenAI
 
         private static TokenCredential CreateDelegatedToken(string token)
         {
-            AccessToken accessToken = new AccessToken(token, DateTimeOffset.Now.AddDays(180));
+            var accessToken = new AccessToken(token, DateTimeOffset.Now.AddDays(180));
             return DelegatedTokenCredential.Create((_, _) => accessToken);
         }
 
@@ -678,6 +902,35 @@ namespace Azure.AI.OpenAI
                 },
                 MaxTokens = DefaultMaxCompletionsTokens,
             };
+        }
+
+        private static string GetOperationPath(ChatCompletionsOptions chatCompletionsOptions)
+            => chatCompletionsOptions.AzureExtensionsOptions != null
+                ? "extensions/chat/completions"
+                : "chat/completions";
+
+        internal HttpMessage CreateGetAudioTranscriptionRequest(string deploymentId, RequestContent content, RequestContext context)
+        {
+            HttpMessage message = _pipeline.CreateMessage(context, ResponseClassifier200);
+            Request request = message.Request;
+            request.Method = RequestMethod.Post;
+            request.Uri = GetUri(deploymentId, "audio/transcriptions");
+            request.Content = content;
+            string boundary = (content as MultipartFormDataRequestContent).Boundary;
+            request.Headers.Add("content-type", $"multipart/form-data; boundary={boundary}");
+            return message;
+        }
+
+        internal HttpMessage CreateGetAudioTranslationRequest(string deploymentId, RequestContent content, RequestContext context)
+        {
+            HttpMessage message = _pipeline.CreateMessage(context, ResponseClassifier200);
+            Request request = message.Request;
+            request.Method = RequestMethod.Post;
+            request.Uri = GetUri(deploymentId, "audio/translations");
+            request.Content = content;
+            string boundary = (content as MultipartFormDataRequestContent).Boundary;
+            request.Headers.Add("content-type", $"multipart/form-data; boundary={boundary}");
+            return message;
         }
     }
 }

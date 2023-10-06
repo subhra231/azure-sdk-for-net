@@ -344,6 +344,133 @@ namespace Azure.Messaging.EventGrid.Tests
         }
         #endregion
 
+        #region Container service events
+        [Test]
+        public void ConsumeContainerServiceSupportEndedEvent()
+        {
+            string requestContent = @"
+            {
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""eventType"": ""Microsoft.ContainerService.ClusterSupportEnded"",
+                ""eventTime"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""kubernetesVersion"": ""1.23.15""
+                },
+                ""dataVersion"": ""1"",
+                ""metadataVersion"": ""1""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEventData).KubernetesVersion);
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEndedEventData).KubernetesVersion);
+        }
+
+        [Test]
+        public void ConsumeContainerServiceSupportEndingEvent()
+        {
+            string requestContent = @"
+            {
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""eventType"": ""Microsoft.ContainerService.ClusterSupportEnding"",
+                ""eventTime"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""kubernetesVersion"": ""1.23.15""
+                },
+                ""dataVersion"": ""1"",
+                ""metadataVersion"": ""1""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEventData).KubernetesVersion);
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEndingEventData).KubernetesVersion);
+        }
+
+        [Test]
+        public void ConsumeContainerServiceNodePoolRollingFailed()
+        {
+            string requestContent = @"
+            {
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""eventType"": ""Microsoft.ContainerService.NodePoolRollingFailed"",
+                ""eventTime"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""dataVersion"": ""1"",
+                ""metadataVersion"": ""1""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingFailedEventData).NodePoolName);
+        }
+
+        [Test]
+        public void ConsumeContainerServiceNodePoolRollingStarted()
+        {
+            string requestContent = @"
+            {
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""eventType"": ""Microsoft.ContainerService.NodePoolRollingStarted"",
+                ""eventTime"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""dataVersion"": ""1"",
+                ""metadataVersion"": ""1""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingStartedEventData).NodePoolName);
+        }
+
+        [Test]
+        public void ConsumeContainerServiceNodePoolRollingSucceeded()
+        {
+            string requestContent = @"
+            {
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""eventType"": ""Microsoft.ContainerService.NodePoolRollingSucceeded"",
+                ""eventTime"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""dataVersion"": ""1"",
+                ""metadataVersion"": ""1""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingSucceededEventData).NodePoolName);
+        }
+        #endregion
+
         #region IoTHub Device events
         [Test]
         public void ConsumeIoTHubDeviceCreatedEvent()
@@ -1658,6 +1785,102 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual(RecordingContentType.Audio, recordingEvent.RecordingContentType);
             Assert.AreEqual(RecordingFormatType.Mp3, recordingEvent.RecordingFormatType);
         }
+
+        [Test]
+        public void ConsumeAcsEmailDeliveryReportReceivedEvent()
+        {
+            string requestContent = @"{
+                ""id"": ""5f04f77c-2a6a-43bd-9b74-576a64c01f9e"",
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/Microsoft.Communication/communicationServices/{communication-services-resource-name}"",
+                ""subject"": ""sender/test2@contoso.org/message/950850f5-bcdf-4315-b77a-6447cf56fac9"",
+                ""data"": {
+                    ""sender"": ""test2@contoso.org"",
+                    ""recipient"": ""test1@contoso.com"",
+                    ""messageId"": ""950850f5-bcdf-4315-b77a-6447cf56fac9"",
+                    ""status"": ""delivered"",
+                    ""deliveryAttemptTimeStamp"": ""2023-02-09T19:46:12.2480265+00:00"",
+                    ""deliveryStatusDetails"": {
+                        ""statusMessage"": ""DestinationMailboxFull""
+                    }
+                },
+                ""eventType"": ""Microsoft.Communication.EmailDeliveryReportReceived"",
+                ""dataVersion"": ""1.0"",
+                ""metadataVersion"": ""1"",
+                ""eventTime"": ""2023-02-09T19:46:12.2478002Z""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var emailEvent = eventData as AcsEmailDeliveryReportReceivedEventData;
+            Assert.IsNotNull(emailEvent);
+            Assert.AreEqual("test2@contoso.org", emailEvent.Sender);
+            Assert.AreEqual("test1@contoso.com", emailEvent.Recipient);
+            Assert.AreEqual(AcsEmailDeliveryReportStatus.Delivered, emailEvent.Status);
+            Assert.AreEqual("DestinationMailboxFull", emailEvent.DeliveryStatusDetails.StatusMessage);
+            Assert.AreEqual(DateTimeOffset.Parse("2023-02-09T19:46:12.2480265+00:00"), emailEvent.DeliveryAttemptTimestamp);
+        }
+
+        [Test]
+        public void ConsumeAcsIncomingCallEvent()
+        {
+            string requestContent = @"{
+                ""id"": ""e80026e7-e298-46ba-bc42-dab0eda92581"",
+                ""topic"": ""/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/Microsoft.Communication/communicationServices/{communication-services-resource-name}"",
+                ""subject"": ""/caller/{caller-id}/recipient/{recipient-id}"",
+                ""data"": {
+                    ""to"": {
+                        ""kind"": ""communicationUser"",
+                        ""rawId"": ""{recipient-id}"",
+                        ""communicationUser"": {
+                            ""id"": ""{recipient-id}""
+                        }
+                    },
+                    ""from"": {
+                        ""kind"": ""communicationUser"",
+                        ""rawId"": ""{caller-id}"",
+                        ""communicationUser"": {
+                            ""id"": ""{caller-id}""
+                        }
+                    },
+                    ""serverCallId"": ""{server-call-id}"",
+                    ""callerDisplayName"": ""VOIP Caller"",
+                    ""customContext"": {
+                        ""sipHeaders"": {
+                            ""userToUser"": ""616d617a6f6e5f6368696;encoding=hex"",
+                            ""X-MS-Custom-myheader1"": ""35567842"",
+                            ""X-MS-Custom-myheader2"": ""customsipheadervalue""
+                        },
+                        ""voipHeaders"": {
+                            ""customHeader"": ""customValue""
+                        }
+                    },
+                    ""incomingCallContext"": ""{incoming-call-contextValue}"",
+                    ""correlationId"": ""correlationId""
+                },
+                ""eventType"": ""Microsoft.Communication.IncomingCall"",
+                ""dataVersion"": ""1.0"",
+                ""metadataVersion"": ""1"",
+                ""eventTime"": ""2023-04-04T17:18:42.5542219Z""
+            }";
+
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var incomingCallEvent = eventData as AcsIncomingCallEventData;
+            Assert.IsNotNull(incomingCallEvent);
+            Assert.AreEqual("{recipient-id}", incomingCallEvent.ToCommunicationIdentifier.CommunicationUser.Id);
+            Assert.AreEqual("{caller-id}", incomingCallEvent.FromCommunicationIdentifier.CommunicationUser.Id);
+            Assert.AreEqual("VOIP Caller", incomingCallEvent.CallerDisplayName);
+            Assert.AreEqual("616d617a6f6e5f6368696;encoding=hex", incomingCallEvent.CustomContext.SipHeaders["userToUser"]);
+            Assert.AreEqual("35567842", incomingCallEvent.CustomContext.SipHeaders["X-MS-Custom-myheader1"]);
+            Assert.AreEqual("customsipheadervalue", incomingCallEvent.CustomContext.SipHeaders["X-MS-Custom-myheader2"]);
+            Assert.AreEqual("customValue", incomingCallEvent.CustomContext.VoipHeaders["customHeader"]);
+            Assert.AreEqual("{incoming-call-contextValue}", incomingCallEvent.IncomingCallContext);
+            Assert.AreEqual("correlationId", incomingCallEvent.CorrelationId);
+        }
         #endregion
 
         #region Health Data Services events
@@ -1724,6 +1947,7 @@ namespace Azure.Messaging.EventGrid.Tests
             ""eventTime"": ""2022-09-15T01:14:04.5613214Z"",
             ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
             ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
                 ""imageStudyInstanceUid"": ""1.2.3.4.3"",
                 ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
                 ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
@@ -1742,6 +1966,41 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
             Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
             Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
+        }
+
+        [Test]
+        public void ConsumeDicomImageUpdatedEvent()
+        {
+            string requestContent = @"{
+            ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.HealthcareApis/workspaces/{workspace-name}"",
+            ""subject"": ""{dicom-account}.dicom.azurehealthcareapis.com/v1/studies/1.2.3.4.3/series/1.2.3.4.3.9423673/instances/1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
+            ""eventType"": ""Microsoft.HealthcareApis.DicomImageUpdated"",
+            ""dataVersion"": ""1"",
+            ""metadataVersion"": ""1"", 
+            ""eventTime"": ""2022-09-15T01:14:04.5613214Z"",
+            ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
+            ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
+                ""imageStudyInstanceUid"": ""1.2.3.4.3"",
+                ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
+                ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
+                ""serviceHostName"": ""{dicom-account}.dicom.azurehealthcareapis.com"",
+                ""sequenceNumber"": 1
+            },
+            ""specVersion"": ""1.0""
+        }";
+            EventGridEvent[] events = EventGridEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var healthEvent = eventData as HealthcareDicomImageUpdatedEventData;
+            Assert.IsNotNull(healthEvent);
+            Assert.AreEqual("1.2.3.4.3", healthEvent.ImageStudyInstanceUid);
+            Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
+            Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
+            Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
         }
 
         [Test]
@@ -1756,6 +2015,7 @@ namespace Azure.Messaging.EventGrid.Tests
             ""eventTime"": ""2022-09-15T01:14:04.5613214Z"",
             ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
             ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
                 ""imageStudyInstanceUid"": ""1.2.3.4.3"",
                 ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
                 ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
@@ -1774,6 +2034,7 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
             Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
             Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
         }
         #endregion
         #endregion
@@ -2038,6 +2299,36 @@ namespace Azure.Messaging.EventGrid.Tests
             var sysEvent = events[0].Data.ToObjectFromJson<AppConfigurationKeyValueModifiedEventData>();
             Assert.AreEqual("key1", sysEvent.Key);
         }
+
+        [Test]
+        public void ConsumeCloudEventAppConfigurationSnapshotCreatedEvent()
+        {
+            string requestContent = "[{\"specversion\": \"1.0\",   \"id\": \"56afc886-767b-d359-d59e-0da7877166b2\",  \"source\": \"/SUBSCRIPTIONS/ID/RESOURCEGROUPS/rg/PROVIDERS/MICROSOFT.Maps/test1\",  \"subject\": \"test1\",  \"type\": \"Microsoft.AppConfiguration.SnapshotCreated\",\"time\": \"2018-01-02T19:17:44.4383997Z\",  \"data\": {\"name\":\"Foo\",\"etag\":\"FnUExLaj2moIi4tJX9AXn9sakm0\",\"syncToken\":\"zAJw6V16=Njo1IzUxNjQ2NzM=;sn=5164673\"}}]";
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("Foo", (eventData as AppConfigurationSnapshotCreatedEventData).Name);
+            Assert.AreEqual("zAJw6V16=Njo1IzUxNjQ2NzM=;sn=5164673", (eventData as AppConfigurationSnapshotCreatedEventData).SyncToken);
+
+            var sysEvent = events[0].Data.ToObjectFromJson<AppConfigurationSnapshotCreatedEventData>();
+            Assert.AreEqual("Foo", sysEvent.Name);
+        }
+
+        [Test]
+        public void ConsumeCloudEventAppConfigurationSnapshotModifiedEvent()
+        {
+            string requestContent = "[{\"specversion\": \"1.0\",   \"id\": \"56afc886-767b-d359-d59e-0da7877166b2\",  \"source\": \"/SUBSCRIPTIONS/ID/RESOURCEGROUPS/rg/PROVIDERS/MICROSOFT.Maps/test1\",  \"subject\": \"test1\",  \"type\": \"Microsoft.AppConfiguration.SnapshotModified\",\"time\": \"2018-01-02T19:17:44.4383997Z\",  \"data\": {\"name\":\"Foo\",\"etag\":\"FnUExLaj2moIi4tJX9AXn9sakm0\",\"syncToken\":\"zAJw6V16=Njo1IzUxNjQ2NzM=;sn=5164673\"}}]";
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("Foo", (eventData as AppConfigurationSnapshotModifiedEventData).Name);
+            Assert.AreEqual("zAJw6V16=Njo1IzUxNjQ2NzM=;sn=5164673", (eventData as AppConfigurationSnapshotModifiedEventData).SyncToken);
+
+            var sysEvent = events[0].Data.ToObjectFromJson<AppConfigurationSnapshotModifiedEventData>();
+            Assert.AreEqual("Foo", sysEvent.Name);
+        }
         #endregion
 
         #region ContainerRegistry events
@@ -2093,6 +2384,128 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.NotNull(events);
             Assert.True(events[0].TryGetSystemEventData(out object eventData));
             Assert.AreEqual("mediatype1", (eventData as ContainerRegistryChartPushedEventData).Target.MediaType);
+        }
+        #endregion
+
+        #region Container service events
+        [Test]
+        public void ConsumeCloudEventContainerServiceSupportEndedEvent()
+        {
+            string requestContent = @"
+            {
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""type"": ""Microsoft.ContainerService.ClusterSupportEnded"",
+                ""time"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""kubernetesVersion"": ""1.23.15""
+                },
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEventData).KubernetesVersion);
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEndedEventData).KubernetesVersion);
+        }
+
+        [Test]
+        public void ConsumeCloudEventContainerServiceSupportEndingEvent()
+        {
+            string requestContent = @"
+            {
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""type"": ""Microsoft.ContainerService.ClusterSupportEnding"",
+                ""time"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""kubernetesVersion"": ""1.23.15""
+                },
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEventData).KubernetesVersion);
+            Assert.AreEqual("1.23.15", (eventData as ContainerServiceClusterSupportEndingEventData).KubernetesVersion);
+        }
+
+        [Test]
+        public void ConsumeCloudEventContainerServiceNodePoolRollingFailed()
+        {
+            string requestContent = @"
+            {
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""type"": ""Microsoft.ContainerService.NodePoolRollingFailed"",
+                ""time"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingFailedEventData).NodePoolName);
+        }
+
+        [Test]
+        public void ConsumeCloudEventContainerServiceNodePoolRollingStarted()
+        {
+            string requestContent = @"
+            {
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""type"": ""Microsoft.ContainerService.NodePoolRollingStarted"",
+                ""time"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingStartedEventData).NodePoolName);
+        }
+
+        [Test]
+        public void ConsumeCloudEventContainerServiceNodePoolRollingSucceeded()
+        {
+            string requestContent = @"
+            {
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group}/providers/Microsoft.ContainerService/managedClusters/{cluster}"",
+                ""subject"": ""{cluster}"",
+                ""type"": ""Microsoft.ContainerService.NodePoolRollingSucceeded"",
+                ""time"": ""2023-03-29T18:00:00.0000000Z"",
+                ""id"": ""1234567890abcdef1234567890abcdef12345678"",
+                ""data"": {
+                    ""nodePoolName"": ""nodepool1""
+                },
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingEventData).NodePoolName);
+            Assert.AreEqual("nodepool1", (eventData as ContainerServiceNodePoolRollingSucceededEventData).NodePoolName);
         }
         #endregion
 
@@ -2181,6 +2594,65 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.NotNull(events);
             Assert.True(events[0].TryGetSystemEventData(out object eventData));
             Assert.AreEqual("/subscriptions/id/resourceGroups/rg/providers/Microsoft.EventGrid/topics/topic1/providers/Microsoft.EventGrid/eventSubscriptions/eventsubscription1", (eventData as SubscriptionDeletedEventData).EventSubscriptionId);
+        }
+
+        [Test]
+        public void ConsumeCloudEventEventGridMqttClientCreatedOrUpdatedEvent()
+        {
+            string requestContent = "[{ \"id\": \"2d1781af-3a4c-4d7c-bd0c-e34b19da4e66\",  \"source\": \"/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\",  \"subject\": \"\",  \"data\": {  \"createdOn\": \"2023-07-29T01:14:34.2048108Z\", \"updatedOn\": \"2023-07-29T01:14:34.2048108Z\",\"namespaceName\": \"myns\",\"clientName\": \"client1\",\"clientAuthenticationName\": \"client1\",\"state\": \"Enabled\",\"attributes\": {\"attribute1\": \"value1\"}  },  \"type\": \"Microsoft.EventGrid.MQTTClientCreatedOrUpdated\",  \"time\": \"2018-01-25T22:12:19.4556811Z\",  \"specversion\": \"1.0\"}]";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientCreatedOrUpdatedEventData).ClientName);
+            Assert.AreEqual("myns", (eventData as EventGridMqttClientCreatedOrUpdatedEventData).NamespaceName);
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientCreatedOrUpdatedEventData).ClientAuthenticationName);
+        }
+
+        [Test]
+        public void ConsumeCloudEventEventGridMqttClientDeletedEvent()
+        {
+            string requestContent = "[{ \"id\": \"2d1781af-3a4c-4d7c-bd0c-e34b19da4e66\",  \"source\": \"/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\",  \"subject\": \"\",  \"data\": {  \"namespaceName\": \"myns\",\"clientName\": \"client1\",\"clientAuthenticationName\": \"client1\" },  \"type\": \"Microsoft.EventGrid.MQTTClientDeleted\",  \"time\": \"2018-01-25T22:12:19.4556811Z\",  \"specversion\": \"1.0\"}]";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientDeletedEventData).ClientName);
+            Assert.AreEqual("myns", (eventData as EventGridMqttClientDeletedEventData).NamespaceName);
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientDeletedEventData).ClientAuthenticationName);
+        }
+
+        [Test]
+        public void ConsumeCloudEventEventGridMqttClientSessionConnectedEvent()
+        {
+            string requestContent = "[{ \"id\": \"2d1781af-3a4c-4d7c-bd0c-e34b19da4e66\",  \"source\": \"/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\",  \"subject\": \"\",  \"data\": {  \"namespaceName\": \"myns\",\"clientSessionName\": \"session\",\"clientAuthenticationName\": \"client1\", \"sequenceNumber\": 1 },  \"type\": \"Microsoft.EventGrid.MQTTClientSessionConnected\",  \"time\": \"2018-01-25T22:12:19.4556811Z\",  \"specversion\": \"1.0\"}]";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("session", (eventData as EventGridMqttClientSessionConnectedEventData).ClientSessionName);
+            Assert.AreEqual("myns", (eventData as EventGridMqttClientSessionConnectedEventData).NamespaceName);
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientSessionConnectedEventData).ClientAuthenticationName);
+            Assert.AreEqual(1, (eventData as EventGridMqttClientSessionConnectedEventData).SequenceNumber);
+        }
+
+        [Test]
+        public void ConsumeCloudEventEventGridMqttClientSessionDisconnectedEvent()
+        {
+            string requestContent = "[{ \"id\": \"2d1781af-3a4c-4d7c-bd0c-e34b19da4e66\",  \"source\": \"/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\",  \"subject\": \"\",  \"data\": {  \"namespaceName\": \"myns\",\"clientSessionName\": \"session\",\"clientAuthenticationName\": \"client1\", \"sequenceNumber\": 1, \"disconnectionReason\": \"ClientInitiatedDisconnect\" },  \"type\": \"Microsoft.EventGrid.MQTTClientSessionDisconnected\",  \"time\": \"2018-01-25T22:12:19.4556811Z\",  \"specversion\": \"1.0\"}]";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            Assert.AreEqual("session", (eventData as EventGridMqttClientSessionDisconnectedEventData).ClientSessionName);
+            Assert.AreEqual("myns", (eventData as EventGridMqttClientSessionDisconnectedEventData).NamespaceName);
+            Assert.AreEqual("client1", (eventData as EventGridMqttClientSessionDisconnectedEventData).ClientAuthenticationName);
+            Assert.AreEqual(1, (eventData as EventGridMqttClientSessionDisconnectedEventData).SequenceNumber);
+            Assert.AreEqual(EventGridMqttClientDisconnectionReason.ClientInitiatedDisconnect, (eventData as EventGridMqttClientSessionDisconnectedEventData).DisconnectionReason);
         }
         #endregion
 
@@ -3200,6 +3672,100 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual(RecordingContentType.Audio, recordingEvent.RecordingContentType);
             Assert.AreEqual(RecordingFormatType.Mp3, recordingEvent.RecordingFormatType);
         }
+
+        [Test]
+        public void ConsumeCloudEventAcsEmailDeliveryReportReceivedEvent()
+        {
+            string requestContent = @"{
+                ""id"": ""5f04f77c-2a6a-43bd-9b74-576a64c01f9e"",
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/Microsoft.Communication/communicationServices/{communication-services-resource-name}"",
+                ""subject"": ""sender/test2@contoso.org/message/950850f5-bcdf-4315-b77a-6447cf56fac9"",
+                ""data"": {
+                    ""sender"": ""test2@contoso.org"",
+                    ""recipient"": ""test1@contoso.com"",
+                    ""messageId"": ""950850f5-bcdf-4315-b77a-6447cf56fac9"",
+                    ""status"": ""delivered"",
+                    ""deliveryStatusDetails"": {
+                        ""statusMessage"": ""DestinationMailboxFull""
+                    },
+                    ""deliveryAttemptTimeStamp"": ""2023-02-09T19:46:12.2480265+00:00""
+                },
+                ""type"": ""Microsoft.Communication.EmailDeliveryReportReceived"",
+                ""time"": ""2023-02-09T19:46:12.2478002Z"",
+                ""specversion"": ""1.0""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var emailEvent = eventData as AcsEmailDeliveryReportReceivedEventData;
+            Assert.IsNotNull(emailEvent);
+            Assert.AreEqual("test2@contoso.org", emailEvent.Sender);
+            Assert.AreEqual("test1@contoso.com", emailEvent.Recipient);
+            Assert.AreEqual(AcsEmailDeliveryReportStatus.Delivered, emailEvent.Status);
+            Assert.AreEqual("DestinationMailboxFull", emailEvent.DeliveryStatusDetails.StatusMessage);
+            Assert.AreEqual(DateTimeOffset.Parse("2023-02-09T19:46:12.2480265+00:00"), emailEvent.DeliveryAttemptTimestamp);
+        }
+
+        [Test]
+        public void ConsumeCloudEventAcsIncomingCallEvent()
+        {
+            string requestContent = @"{
+                ""id"": ""e80026e7-e298-46ba-bc42-dab0eda92581"",
+                ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/Microsoft.Communication/communicationServices/{communication-services-resource-name}"",
+                ""subject"": ""/caller/{caller-id}/recipient/{recipient-id}"",
+                ""data"": {
+                    ""to"": {
+                        ""kind"": ""communicationUser"",
+                        ""rawId"": ""{recipient-id}"",
+                        ""communicationUser"": {
+                            ""id"": ""{recipient-id}""
+                        }
+                    },
+                    ""from"": {
+                        ""kind"": ""communicationUser"",
+                        ""rawId"": ""{caller-id}"",
+                        ""communicationUser"": {
+                            ""id"": ""{caller-id}""
+                        }
+                    },
+                    ""serverCallId"": ""{server-call-id}"",
+                    ""callerDisplayName"": ""VOIP Caller"",
+                    ""customContext"": {
+                        ""sipHeaders"": {
+                            ""userToUser"": ""616d617a6f6e5f6368696;encoding=hex"",
+                            ""X-MS-Custom-myheader1"": ""35567842"",
+                            ""X-MS-Custom-myheader2"": ""customsipheadervalue""
+                        },
+                        ""voipHeaders"": {
+                            ""customHeader"": ""customValue""
+                        }
+                    },
+                    ""incomingCallContext"": ""{incoming-call-contextValue}"",
+                    ""correlationId"": ""correlationId""
+                },
+                ""type"": ""Microsoft.Communication.IncomingCall"",
+                ""specversion"": ""1.0"",
+                ""time"": ""2023-04-04T17:18:42.5542219Z""
+            }";
+
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var incomingCallEvent = eventData as AcsIncomingCallEventData;
+            Assert.IsNotNull(incomingCallEvent);
+            Assert.AreEqual("{recipient-id}", incomingCallEvent.ToCommunicationIdentifier.CommunicationUser.Id);
+            Assert.AreEqual("{caller-id}", incomingCallEvent.FromCommunicationIdentifier.CommunicationUser.Id);
+            Assert.AreEqual("VOIP Caller", incomingCallEvent.CallerDisplayName);
+            Assert.AreEqual("616d617a6f6e5f6368696;encoding=hex", incomingCallEvent.CustomContext.SipHeaders["userToUser"]);
+            Assert.AreEqual("35567842", incomingCallEvent.CustomContext.SipHeaders["X-MS-Custom-myheader1"]);
+            Assert.AreEqual("customsipheadervalue", incomingCallEvent.CustomContext.SipHeaders["X-MS-Custom-myheader2"]);
+            Assert.AreEqual("customValue", incomingCallEvent.CustomContext.VoipHeaders["customHeader"]);
+            Assert.AreEqual("{incoming-call-contextValue}", incomingCallEvent.IncomingCallContext);
+            Assert.AreEqual("correlationId", incomingCallEvent.CorrelationId);
+        }
         #endregion
 
         #region Health Data Services events
@@ -3264,6 +3830,7 @@ namespace Azure.Messaging.EventGrid.Tests
             ""time"": ""2022-09-15T01:14:04.5613214Z"",
             ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
             ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
                 ""imageStudyInstanceUid"": ""1.2.3.4.3"",
                 ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
                 ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
@@ -3282,6 +3849,39 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
             Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
             Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
+        }
+
+        [Test]
+        public void ConsumeCloudEventDicomImageUpdatedEvent()
+        {
+            string requestContent = @"{
+            ""source"": ""/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.HealthcareApis/workspaces/{workspace-name}"",
+            ""subject"": ""{dicom-account}.dicom.azurehealthcareapis.com/v1/studies/1.2.3.4.3/series/1.2.3.4.3.9423673/instances/1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
+            ""type"": ""Microsoft.HealthcareApis.DicomImageUpdated"",
+            ""time"": ""2022-09-15T01:14:04.5613214Z"",
+            ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
+            ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
+                ""imageStudyInstanceUid"": ""1.2.3.4.3"",
+                ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
+                ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
+                ""serviceHostName"": ""{dicom-account}.dicom.azurehealthcareapis.com"",
+                ""sequenceNumber"": 1
+            },
+            ""specversion"": ""1.0""
+        }";
+            CloudEvent[] events = CloudEvent.ParseMany(new BinaryData(requestContent));
+
+            Assert.NotNull(events);
+            Assert.True(events[0].TryGetSystemEventData(out object eventData));
+            var healthEvent = eventData as HealthcareDicomImageUpdatedEventData;
+            Assert.IsNotNull(healthEvent);
+            Assert.AreEqual("1.2.3.4.3", healthEvent.ImageStudyInstanceUid);
+            Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
+            Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
+            Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
         }
 
         [Test]
@@ -3294,6 +3894,7 @@ namespace Azure.Messaging.EventGrid.Tests
             ""time"": ""2022-09-15T01:14:04.5613214Z"",
             ""id"": ""d621839d-958b-4142-a638-bb966b4f7dfd"",
             ""data"": {
+                ""partitionName"": ""Microsoft.Default"",
                 ""imageStudyInstanceUid"": ""1.2.3.4.3"",
                 ""imageSeriesInstanceUid"": ""1.2.3.4.3.9423673"",
                 ""imageSopInstanceUid"": ""1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442"",
@@ -3312,6 +3913,7 @@ namespace Azure.Messaging.EventGrid.Tests
             Assert.AreEqual("1.2.3.4.3.9423673", healthEvent.ImageSeriesInstanceUid);
             Assert.AreEqual("1.3.6.1.4.1.45096.2.296485376.2210.1633373143.864442", healthEvent.ImageSopInstanceUid);
             Assert.AreEqual(1, healthEvent.SequenceNumber);
+            Assert.AreEqual("Microsoft.Default", healthEvent.PartitionName);
         }
         #endregion
 

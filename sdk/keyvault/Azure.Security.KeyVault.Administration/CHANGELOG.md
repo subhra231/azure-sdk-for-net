@@ -4,11 +4,17 @@
 
 ### Features Added
 
+- TODO: sasToken vs. useManagedIdentity.
+
 ### Breaking Changes
 
 ### Bugs Fixed
 
+- When a Key Vault is moved to another tenant, the client is reauthenticated.
+
 ### Other Changes
+
+- The default service version is now "7.5-preview.1".
 
 ## 4.3.0 (2023-03-14)
 

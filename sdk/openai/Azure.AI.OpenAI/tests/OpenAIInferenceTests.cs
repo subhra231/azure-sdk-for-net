@@ -13,7 +13,7 @@ namespace Azure.AI.OpenAI.Tests
     public class OpenAIInferenceTests : OpenAITestBase
     {
         public OpenAIInferenceTests(bool isAsync)
-            : base(isAsync)//, RecordedTestMode.Live)
+            : base(isAsync) // , RecordedTestMode.Live)
         {
         }
 
@@ -23,9 +23,9 @@ namespace Azure.AI.OpenAI.Tests
         public async Task Completions(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Completions);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             Assert.That(client, Is.InstanceOf<OpenAIClient>());
-            CompletionsOptions requestOptions = new CompletionsOptions()
+            CompletionsOptions requestOptions = new()
             {
                 Prompts =
                 {
@@ -49,9 +49,9 @@ namespace Azure.AI.OpenAI.Tests
         public async Task SimpleCompletions(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(
                 serviceTarget,
-                OpenAIClientScenario.Completions);
+                OpenAIClientScenario.LegacyCompletions);
             Response<Completions> response = await client.GetCompletionsAsync(deploymentOrModelName, "Hello world!");
             Assert.That(response, Is.InstanceOf<Response<Completions>>());
         }
@@ -62,11 +62,12 @@ namespace Azure.AI.OpenAI.Tests
         public async Task CompletionsWithTokenCredential(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget, OpenAIClientAuthenticationType.Token);
+            string deploymentName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             var requestOptions = new CompletionsOptions();
             requestOptions.Prompts.Add("Hello, world!");
             requestOptions.Prompts.Add("I can have multiple prompts");
             Assert.That(requestOptions, Is.InstanceOf<CompletionsOptions>());
-            Response<Completions> response = await client.GetCompletionsAsync(CompletionsDeploymentId, requestOptions);
+            Response<Completions> response = await client.GetCompletionsAsync(deploymentName, requestOptions);
             Assert.That(response, Is.InstanceOf<Response<Completions>>());
             Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
             Assert.That(response.Value.Choices.Count, Is.EqualTo(2));
@@ -78,7 +79,7 @@ namespace Azure.AI.OpenAI.Tests
         public async Task Embeddings(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Embeddings);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Embeddings);
             var embeddingsRequest = new EmbeddingsOptions("Your text string goes here");
             Assert.That(embeddingsRequest, Is.InstanceOf<EmbeddingsOptions>());
             Response<Embeddings> response = await client.GetEmbeddingsAsync(deploymentOrModelName, embeddingsRequest);
@@ -91,7 +92,7 @@ namespace Azure.AI.OpenAI.Tests
         public async Task CompletionsUsageField(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Completions);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             var requestOptions = new CompletionsOptions()
             {
                 Prompts =
@@ -108,8 +109,8 @@ namespace Azure.AI.OpenAI.Tests
             Assert.That(response.GetRawResponse(), Is.Not.Null.Or.Empty);
             Assert.That(response.Value, Is.Not.Null);
             Assert.That(response.Value.Id, Is.Not.Null.Or.Empty);
-            Assert.That(response.Value.Model, Is.EqualTo(CompletionsDeploymentId));
-            Assert.That(response.Value.Created, Is.GreaterThan(0));
+            Assert.That(response.Value.Created, Is.GreaterThan(new DateTimeOffset(new DateTime(2023, 1, 1))));
+            Assert.That(response.Value.Created, Is.LessThan(DateTimeOffset.UtcNow.AddDays(7)));
             Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
             Assert.That(response.Value.Choices.Count, Is.EqualTo(expectedChoiceCount), "Each prompt should produce `SnippetCount` choices");
             Assert.That(response.Value.Usage, Is.Not.Null);
@@ -120,10 +121,10 @@ namespace Azure.AI.OpenAI.Tests
             Assert.That(firstChoice, Is.Not.Null);
             Assert.That(firstChoice.FinishReason, Is.Not.Null.Or.Empty);
             Assert.That(firstChoice.Text, Is.Not.Null.Or.Empty);
-            Assert.That(firstChoice.Logprobs, Is.Not.Null);
-            Assert.That(firstChoice.Logprobs.Tokens, Is.Not.Null.Or.Empty);
-            Assert.That(firstChoice.Logprobs.Tokens.Count, Is.LessThan(response.Value.Usage.TotalTokens));
-            Assert.That(firstChoice.Logprobs.Tokens[0], Is.Not.Null.Or.Empty);
+            Assert.That(firstChoice.LogProbabilityModel, Is.Not.Null);
+            Assert.That(firstChoice.LogProbabilityModel.Tokens, Is.Not.Null.Or.Empty);
+            Assert.That(firstChoice.LogProbabilityModel.Tokens.Count, Is.LessThan(response.Value.Usage.TotalTokens));
+            Assert.That(firstChoice.LogProbabilityModel.Tokens[0], Is.Not.Null.Or.Empty);
 
             Assert.That(response.Value.Choices[2].Index, Is.EqualTo(2));
         }
@@ -134,7 +135,7 @@ namespace Azure.AI.OpenAI.Tests
         public async Task ChatCompletions(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(
                 serviceTarget,
                 OpenAIClientScenario.ChatCompletions);
             var requestOptions = new ChatCompletionsOptions()
@@ -146,7 +147,6 @@ namespace Azure.AI.OpenAI.Tests
                     new ChatMessage(ChatRole.Assistant, "Of course! What do you need help with?"),
                     new ChatMessage(ChatRole.User, "What temperature should I bake pizza at?"),
                 },
-                MaxTokens = 512,
             };
             Response<ChatCompletions> response = await client.GetChatCompletionsAsync(
                 deploymentOrModelName,
@@ -159,9 +159,68 @@ namespace Azure.AI.OpenAI.Tests
             Assert.That(response.Value.Choices.Count, Is.EqualTo(1));
             ChatChoice choice = response.Value.Choices[0];
             Assert.That(choice.Index, Is.EqualTo(0));
-            Assert.That(choice.FinishReason, Is.EquivalentTo("stop"));
+            Assert.That(choice.FinishReason, Is.EqualTo(CompletionsFinishReason.Stopped));
             Assert.That(choice.Message.Role, Is.EqualTo(ChatRole.Assistant));
             Assert.That(choice.Message.Content, Is.Not.Null.Or.Empty);
+        }
+
+        [RecordedTest]
+        [TestCase(OpenAIClientServiceTarget.Azure)]
+        [TestCase(OpenAIClientServiceTarget.NonAzure)]
+        public async Task ChatCompletionsContentFilterCategories(OpenAIClientServiceTarget serviceTarget)
+        {
+            OpenAIClient client = GetTestClient(serviceTarget);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.ChatCompletions);
+            var requestOptions = new ChatCompletionsOptions()
+            {
+                Messages =
+                {
+                    new ChatMessage(ChatRole.User, "How do I cook a bell pepper?"),
+                },
+            };
+            Response<ChatCompletions> response = await client.GetChatCompletionsAsync(deploymentOrModelName, requestOptions);
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Value, Is.Not.Null);
+            Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
+
+            ChatChoice firstChoice = response.Value.Choices[0];
+            Assert.That(firstChoice, Is.Not.Null);
+
+            AssertExpectedPromptFilterResults(
+                response.Value.PromptFilterResults,
+                serviceTarget,
+                expectedCount: (requestOptions.ChoiceCount ?? 1));
+            AssertExpectedContentFilterResults(firstChoice.ContentFilterResults, serviceTarget);
+        }
+
+        [RecordedTest]
+        [TestCase(OpenAIClientServiceTarget.Azure)]
+        [TestCase(OpenAIClientServiceTarget.NonAzure)]
+        public async Task CompletionsContentFilterCategories(OpenAIClientServiceTarget serviceTarget)
+        {
+            OpenAIClient client = GetTestClient(serviceTarget);
+            string deploymentOrModelName
+                = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
+            var requestOptions = new CompletionsOptions()
+            {
+                Prompts = { "How do I cook a bell pepper?" },
+                Temperature = 0
+            };
+            Response<Completions> response = await client.GetCompletionsAsync(deploymentOrModelName, requestOptions);
+
+            Assert.That(response, Is.Not.Null);
+            Assert.That(response.Value, Is.Not.Null);
+            Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
+
+            Choice firstChoice = response.Value.Choices[0];
+            Assert.That(firstChoice, Is.Not.Null);
+
+            AssertExpectedPromptFilterResults(
+                response.Value.PromptFilterResults,
+                serviceTarget,
+                expectedCount: requestOptions.Prompts.Count * (requestOptions.ChoicesPerPrompt ?? 1));
+            AssertExpectedContentFilterResults(firstChoice.ContentFilterResults, serviceTarget);
         }
 
         [RecordedTest]
@@ -170,7 +229,7 @@ namespace Azure.AI.OpenAI.Tests
         public async Task StreamingChatCompletions(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(
                 serviceTarget,
                 OpenAIClientScenario.ChatCompletions);
             var requestOptions = new ChatCompletionsOptions()
@@ -200,15 +259,27 @@ namespace Azure.AI.OpenAI.Tests
                     Assert.That(streamingMessage.Role, Is.EqualTo(ChatRole.Assistant));
                     totalMessages++;
                 }
+                AssertExpectedContentFilterResults(streamingChoice.ContentFilterResults, serviceTarget);
             }
 
             Assert.That(totalMessages, Is.GreaterThan(1));
+
+            // Note: these top-level values *are likely not yet populated* until *after* at least one streaming
+            // choice has arrived.
+            Assert.That(streamingResponse.GetRawResponse(), Is.Not.Null.Or.Empty);
+            Assert.That(streamingChatCompletions.Id, Is.Not.Null.Or.Empty);
+            Assert.That(streamingChatCompletions.Created, Is.GreaterThan(new DateTimeOffset(new DateTime(2023, 1, 1))));
+            Assert.That(streamingChatCompletions.Created, Is.LessThan(DateTimeOffset.UtcNow.AddDays(7)));
+            AssertExpectedPromptFilterResults(streamingChatCompletions.PromptFilterResults, serviceTarget, (requestOptions.ChoiceCount ?? 1));
         }
 
-        private async Task InternalAdvancedCompletionsOptions(OpenAIClientServiceTarget serviceTarget)
+        [RecordedTest]
+        [TestCase(OpenAIClientServiceTarget.Azure)]
+        [TestCase(OpenAIClientServiceTarget.NonAzure)]
+        public async Task AdvancedCompletionsOptions(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Completions);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             string promptText = "Are bananas especially radioactive?";
             var requestOptions = new CompletionsOptions()
             {
@@ -218,8 +289,17 @@ namespace Azure.AI.OpenAI.Tests
                 User = "AzureSDKOpenAITests",
                 Echo = true,
                 LogProbabilityCount = 1,
+                MaxTokens = 512,
+                TokenSelectionBiases =
+                {
+                    [25996] = -100, // ' banana', with the leading space
+                    [35484] = -100, // ' bananas', with the leading space
+                    [40058] = -100, // ' Banana'
+                    [15991] = -100, // 'anas'
+                },
             };
             Response<Completions> response = await client.GetCompletionsAsync(deploymentOrModelName, requestOptions);
+
             Assert.That(response, Is.Not.Null);
             string rawResponse = response.GetRawResponse().Content.ToString();
             Assert.That(rawResponse, Is.Not.Null.Or.Empty);
@@ -227,11 +307,18 @@ namespace Azure.AI.OpenAI.Tests
             Assert.That(response.Value, Is.Not.Null);
             Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
             Assert.That(response.Value.Choices.Count, Is.EqualTo(1));
-            Assert.That(response.Value.Choices[0].Text.ToLower().StartsWith(promptText.ToLower()));
 
-            Assert.That(response.Value.Choices[0].Logprobs, Is.Not.Null.Or.Empty);
-            Assert.That(response.Value.Choices[0].Logprobs.Tokens, Is.Not.Null.Or.Empty);
-            Assert.That(response.Value.Usage.TotalTokens, Is.GreaterThan(response.Value.Choices[0].Logprobs.Tokens.Count));
+            Choice choice = response.Value.Choices[0];
+
+            string choiceText = choice.Text;
+            Assert.That(choiceText, Is.Not.Null.Or.Empty);
+            Assert.That(choiceText.Length, Is.GreaterThan(promptText.Length));
+            Assert.That(choiceText.ToLower().StartsWith(promptText.ToLower()));
+            Assert.That(choiceText.Substring(promptText.Length).Contains(" banana"), Is.False);
+
+            Assert.That(choice.LogProbabilityModel, Is.Not.Null.Or.Empty);
+            Assert.That(choice.LogProbabilityModel.Tokens, Is.Not.Null.Or.Empty);
+            Assert.That(response.Value.Usage.TotalTokens, Is.GreaterThan(response.Value.Choices[0].LogProbabilityModel.Tokens.Count));
         }
 
         [RecordedTest]
@@ -256,7 +343,7 @@ namespace Azure.AI.OpenAI.Tests
         public async Task TokenCutoff(OpenAIClientServiceTarget serviceTarget)
         {
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Completions);
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             var requestOptions = new CompletionsOptions()
             {
                 Prompts =
@@ -270,7 +357,9 @@ namespace Azure.AI.OpenAI.Tests
             Assert.That(response, Is.Not.Null);
             Assert.That(response.Value, Is.Not.Null);
             Assert.That(response.Value.Choices, Is.Not.Null.Or.Empty);
-            Assert.That(response.Value.Choices[0].FinishReason, Is.EqualTo("length"));
+            Assert.That(response.Value.Choices[0].FinishReason, Is.EqualTo(CompletionsFinishReason.TokenLimitReached));
+            Assert.IsTrue(response.Value.Choices[0].FinishReason == CompletionsFinishReason.TokenLimitReached);
+            Assert.IsTrue(response.Value.Choices[0].FinishReason == "length");
         }
 
         [RecordedTest]
@@ -278,8 +367,12 @@ namespace Azure.AI.OpenAI.Tests
         [TestCase(OpenAIClientServiceTarget.NonAzure)]
         public async Task StreamingCompletions(OpenAIClientServiceTarget serviceTarget)
         {
+            // Temporary test note: at the time of authoring, content filter results aren't included for completions
+            // with the latest 2023-07-01-preview service API version. We'll manually configure one version behind
+            // pending the latest version having these results enabled.
             OpenAIClient client = GetTestClient(serviceTarget);
-            string deploymentOrModelName = GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.Completions);
+
+            string deploymentOrModelName = OpenAITestBase.GetDeploymentOrModelName(serviceTarget, OpenAIClientScenario.LegacyCompletions);
             var requestOptions = new CompletionsOptions()
             {
                 Prompts =
@@ -306,20 +399,16 @@ namespace Azure.AI.OpenAI.Tests
 
             await foreach (StreamingChoice choice in responseValue.GetChoicesStreaming())
             {
-                List<string> textPartsForChoice = new List<string>();
-                StringBuilder choiceTextBuilder = new StringBuilder();
+                List<string> textPartsForChoice = new();
+                StringBuilder choiceTextBuilder = new();
                 await foreach (string choiceTextPart in choice.GetTextStreaming())
                 {
                     choiceTextBuilder.Append(choiceTextPart);
                     textPartsForChoice.Add(choiceTextPart);
                 }
                 Assert.That(choiceTextBuilder.ToString(), Is.Not.Null.Or.Empty);
-                // Note: needs to be clarified why AOAI sets this and OAI does not
-                if (serviceTarget == OpenAIClientServiceTarget.Azure)
-                {
-                    Assert.That(choice.FinishReason, Is.Not.Null.Or.Empty);
-                }
-                Assert.That(choice.Logprobs, Is.Not.Null);
+                Assert.That(choice.LogProbabilityModel, Is.Not.Null);
+                AssertExpectedContentFilterResults(choice.ContentFilterResults, serviceTarget);
                 originallyEnumeratedChoices++;
                 originallyEnumeratedTextParts.Add(textPartsForChoice);
             }
@@ -328,8 +417,13 @@ namespace Azure.AI.OpenAI.Tests
             // choice has arrived.
             Assert.That(response.GetRawResponse(), Is.Not.Null.Or.Empty);
             Assert.That(responseValue.Id, Is.Not.Null.Or.Empty);
-            Assert.That(responseValue.Created, Is.GreaterThan(new DateTime(2022, 1, 1)));
-            Assert.That(responseValue.Created, Is.LessThan(DateTime.Now.AddDays(2)));
+            Assert.That(responseValue.Created, Is.GreaterThan(new DateTimeOffset(new DateTime(2023, 1, 1))));
+            Assert.That(responseValue.Created, Is.LessThan(DateTimeOffset.UtcNow.AddDays(7)));
+
+            AssertExpectedPromptFilterResults(
+                responseValue.PromptFilterResults,
+                serviceTarget,
+                expectedCount: requestOptions.Prompts.Count * (requestOptions.ChoicesPerPrompt ?? 1));
 
             // Validate stability of enumeration (non-cancelled case)
             IReadOnlyList<StreamingChoice> secondPassChoices = await GetBlockingListFromIAsyncEnumerable(
@@ -347,16 +441,76 @@ namespace Azure.AI.OpenAI.Tests
             }
         }
 
+        [RecordedTest]
+        [Ignore("Built-in serialization/deserialization not yet supported, but can be achieved with a custom converter")]
+        public void JsonTypeSerialization()
+        {
+            var originalMessage = new ChatMessage(ChatRole.User, "How do I make a great taco?");
+
+            string clearTextSerializedMessage = System.Text.Json.JsonSerializer.Serialize(originalMessage);
+            ChatMessage messageFromClearText = System.Text.Json.JsonSerializer.Deserialize<ChatMessage>(clearTextSerializedMessage);
+            Assert.That(messageFromClearText.Role, Is.EqualTo(originalMessage.Role));
+            Assert.That(messageFromClearText.Content, Is.EqualTo(originalMessage.Content));
+
+            byte[] utf8SerializedMessage = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(originalMessage);
+            ChatMessage messageFromUtf8Bytes = System.Text.Json.JsonSerializer.Deserialize<ChatMessage>(utf8SerializedMessage);
+            Assert.That(messageFromUtf8Bytes.Role, Is.EqualTo(originalMessage.Role));
+            Assert.That(messageFromUtf8Bytes.Content, Is.EqualTo(originalMessage.Content));
+        }
+
         // Lightweight reimplementation of .NET 7 .ToBlockingEnumerable().ToList()
         private static async Task<IReadOnlyList<T>> GetBlockingListFromIAsyncEnumerable<T>(
             IAsyncEnumerable<T> asyncValues)
         {
-            List<T> result = new List<T>();
+            List<T> result = new();
             await foreach (T asyncValue in asyncValues)
             {
                 result.Add(asyncValue);
             }
             return result;
+        }
+
+        private void AssertExpectedPromptFilterResults(
+            IReadOnlyList<PromptFilterResult> promptFilterResults,
+            OpenAIClientServiceTarget serviceTarget,
+            int expectedCount)
+        {
+            if (serviceTarget == OpenAIClientServiceTarget.NonAzure)
+            {
+                Assert.That(promptFilterResults, Is.Null.Or.Empty);
+            }
+            else
+            {
+                Assert.That(promptFilterResults, Is.Not.Null.Or.Empty);
+                Assert.That(promptFilterResults.Count, Is.EqualTo(expectedCount));
+                for (int i = 0; i < promptFilterResults.Count; i++)
+                {
+                    Assert.That(promptFilterResults[i].PromptIndex, Is.EqualTo(i));
+                    Assert.That(promptFilterResults[i].ContentFilterResults, Is.Not.Null);
+                    Assert.That(promptFilterResults[i].ContentFilterResults.Hate, Is.Not.Null);
+                    Assert.That(promptFilterResults[i].ContentFilterResults.Hate.Filtered, Is.False);
+                    Assert.That(
+                        promptFilterResults[0].ContentFilterResults.Hate.Severity,
+                        Is.EqualTo(ContentFilterSeverity.Safe));
+                }
+            }
+        }
+
+        private void AssertExpectedContentFilterResults(
+            ContentFilterResults contentFilterResults,
+            OpenAIClientServiceTarget serviceTarget)
+        {
+            if (serviceTarget == OpenAIClientServiceTarget.NonAzure)
+            {
+                Assert.That(contentFilterResults, Is.Null);
+            }
+            else
+            {
+                Assert.That(contentFilterResults, Is.Not.Null.Or.Empty);
+                Assert.That(contentFilterResults.Hate, Is.Not.Null);
+                Assert.That(contentFilterResults.Hate.Filtered, Is.False);
+                Assert.That(contentFilterResults.Hate.Severity, Is.EqualTo(ContentFilterSeverity.Safe));
+            }
         }
     }
 }

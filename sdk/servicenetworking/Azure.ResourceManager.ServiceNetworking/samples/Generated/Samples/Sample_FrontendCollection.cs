@@ -12,7 +12,6 @@ using Azure.Core;
 using Azure.Identity;
 using Azure.ResourceManager;
 using Azure.ResourceManager.ServiceNetworking;
-using Azure.ResourceManager.ServiceNetworking.Models;
 
 namespace Azure.ResourceManager.ServiceNetworking.Samples
 {
@@ -35,7 +34,7 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             // for more information of creating TrafficControllerResource, please refer to the document of TrafficControllerResource
             string subscriptionId = "subid";
             string resourceGroupName = "rg1";
-            string trafficControllerName = "TC1";
+            string trafficControllerName = "tc1";
             ResourceIdentifier trafficControllerResourceId = TrafficControllerResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, trafficControllerName);
             TrafficControllerResource trafficController = client.GetTrafficControllerResource(trafficControllerResourceId);
 
@@ -72,7 +71,7 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             // for more information of creating TrafficControllerResource, please refer to the document of TrafficControllerResource
             string subscriptionId = "subid";
             string resourceGroupName = "rg1";
-            string trafficControllerName = "TC1";
+            string trafficControllerName = "tc1";
             ResourceIdentifier trafficControllerResourceId = TrafficControllerResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, trafficControllerName);
             TrafficControllerResource trafficController = client.GetTrafficControllerResource(trafficControllerResourceId);
 
@@ -80,7 +79,7 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             FrontendCollection collection = trafficController.GetFrontends();
 
             // invoke the operation
-            string frontendName = "publicIp1";
+            string frontendName = "fe1";
             FrontendResource result = await collection.GetAsync(frontendName);
 
             // the variable result is a resource, you could call other operations on this instance as well
@@ -107,7 +106,7 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             // for more information of creating TrafficControllerResource, please refer to the document of TrafficControllerResource
             string subscriptionId = "subid";
             string resourceGroupName = "rg1";
-            string trafficControllerName = "TC1";
+            string trafficControllerName = "tc1";
             ResourceIdentifier trafficControllerResourceId = TrafficControllerResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, trafficControllerName);
             TrafficControllerResource trafficController = client.GetTrafficControllerResource(trafficControllerResourceId);
 
@@ -115,10 +114,53 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             FrontendCollection collection = trafficController.GetFrontends();
 
             // invoke the operation
-            string frontendName = "publicIp1";
+            string frontendName = "fe1";
             bool result = await collection.ExistsAsync(frontendName);
 
             Console.WriteLine($"Succeeded: {result}");
+        }
+
+        // Get Frontend
+        [NUnit.Framework.Test]
+        [NUnit.Framework.Ignore("Only verifying that the sample builds")]
+        public async Task GetIfExists_GetFrontend()
+        {
+            // Generated from example definition: specification/servicenetworking/resource-manager/Microsoft.ServiceNetworking/cadl/examples/FrontendGet.json
+            // this example is just showing the usage of "FrontendsInterface_Get" operation, for the dependent resources, they will have to be created separately.
+
+            // get your azure access token, for more details of how Azure SDK get your access token, please refer to https://learn.microsoft.com/en-us/dotnet/azure/sdk/authentication?tabs=command-line
+            TokenCredential cred = new DefaultAzureCredential();
+            // authenticate your client
+            ArmClient client = new ArmClient(cred);
+
+            // this example assumes you already have this TrafficControllerResource created on azure
+            // for more information of creating TrafficControllerResource, please refer to the document of TrafficControllerResource
+            string subscriptionId = "subid";
+            string resourceGroupName = "rg1";
+            string trafficControllerName = "tc1";
+            ResourceIdentifier trafficControllerResourceId = TrafficControllerResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, trafficControllerName);
+            TrafficControllerResource trafficController = client.GetTrafficControllerResource(trafficControllerResourceId);
+
+            // get the collection of this FrontendResource
+            FrontendCollection collection = trafficController.GetFrontends();
+
+            // invoke the operation
+            string frontendName = "fe1";
+            NullableResponse<FrontendResource> response = await collection.GetIfExistsAsync(frontendName);
+            FrontendResource result = response.HasValue ? response.Value : null;
+
+            if (result == null)
+            {
+                Console.WriteLine($"Succeeded with null as result");
+            }
+            else
+            {
+                // the variable result is a resource, you could call other operations on this instance as well
+                // but just for demo, we get its data from this resource instance
+                FrontendData resourceData = result.Data;
+                // for demo we just print out the id
+                Console.WriteLine($"Succeeded on id: {resourceData.Id}");
+            }
         }
 
         // Put Frontend
@@ -138,7 +180,7 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             // for more information of creating TrafficControllerResource, please refer to the document of TrafficControllerResource
             string subscriptionId = "subid";
             string resourceGroupName = "rg1";
-            string trafficControllerName = "TC1";
+            string trafficControllerName = "tc1";
             ResourceIdentifier trafficControllerResourceId = TrafficControllerResource.CreateResourceIdentifier(subscriptionId, resourceGroupName, trafficControllerName);
             TrafficControllerResource trafficController = client.GetTrafficControllerResource(trafficControllerResourceId);
 
@@ -146,13 +188,8 @@ namespace Azure.ResourceManager.ServiceNetworking.Samples
             FrontendCollection collection = trafficController.GetFrontends();
 
             // invoke the operation
-            string frontendName = "publicIp1";
-            FrontendData data = new FrontendData(new AzureLocation("West US"))
-            {
-                Mode = FrontendMode.Public,
-                IPAddressVersion = FrontendIPAddressVersion.IPv4,
-                PublicIPAddressId = new ResourceIdentifier("resourceUriAsString"),
-            };
+            string frontendName = "fe1";
+            FrontendData data = new FrontendData(new AzureLocation("NorthCentralUS"));
             ArmOperation<FrontendResource> lro = await collection.CreateOrUpdateAsync(WaitUntil.Completed, frontendName, data);
             FrontendResource result = lro.Value;
 

@@ -5,10 +5,10 @@
 
 #nullable disable
 
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using Azure;
-using Azure.Core;
 
 namespace Azure.AI.AnomalyDetector
 {
@@ -20,14 +20,14 @@ namespace Azure.AI.AnomalyDetector
             {
                 return null;
             }
-            string resultId = default;
+            Guid resultId = default;
             MultivariateBatchDetectionResultSummary summary = default;
             IReadOnlyList<AnomalyState> results = default;
             foreach (var property in element.EnumerateObject())
             {
                 if (property.NameEquals("resultId"u8))
                 {
-                    resultId = property.Value.GetString();
+                    resultId = property.Value.GetGuid();
                     continue;
                 }
                 if (property.NameEquals("summary"u8))

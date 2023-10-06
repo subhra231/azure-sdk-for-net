@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Autorest.CSharp.Core;
 using Azure;
 using Azure.Core;
 using Azure.Core.Pipeline;
@@ -50,15 +51,24 @@ namespace Azure.Verticals.AgriFood.Farming
             _apiVersion = apiVersion;
         }
 
-        /// <summary> Create a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Create a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping. </param>
-        /// <param name="content"> The content to send as the body of the request. Details of the request body schema are in the Remarks section below. </param>
+        /// <param name="content"> The content to send as the body of the request. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> or <paramref name="content"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
-        /// <returns> The response returned from the service. Details of the response body schema are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='CreateOrUpdateAsync(String,RequestContent,RequestContext)']/*" />
+        /// <returns> The response returned from the service. </returns>
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='CreateOrUpdateAsync(string,RequestContent,RequestContext)']/*" />
         public virtual async Task<Response> CreateOrUpdateAsync(string sensorMappingId, RequestContent content, RequestContext context = null)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
@@ -78,15 +88,24 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Create a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Create a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping. </param>
-        /// <param name="content"> The content to send as the body of the request. Details of the request body schema are in the Remarks section below. </param>
+        /// <param name="content"> The content to send as the body of the request. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> or <paramref name="content"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
-        /// <returns> The response returned from the service. Details of the response body schema are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='CreateOrUpdate(String,RequestContent,RequestContext)']/*" />
+        /// <returns> The response returned from the service. </returns>
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='CreateOrUpdate(string,RequestContent,RequestContext)']/*" />
         public virtual Response CreateOrUpdate(string sensorMappingId, RequestContent content, RequestContext context = null)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
@@ -106,15 +125,24 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Gets a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Gets a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping resource. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
-        /// <returns> The response returned from the service. Details of the response body schema are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappingAsync(String,RequestContext)']/*" />
-        public virtual async Task<Response> GetSensorMappingAsync(string sensorMappingId, RequestContext context = null)
+        /// <returns> The response returned from the service. </returns>
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappingAsync(string,RequestContext)']/*" />
+        public virtual async Task<Response> GetSensorMappingAsync(string sensorMappingId, RequestContext context)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
 
@@ -132,15 +160,24 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Gets a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Gets a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping resource. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
-        /// <returns> The response returned from the service. Details of the response body schema are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMapping(String,RequestContext)']/*" />
-        public virtual Response GetSensorMapping(string sensorMappingId, RequestContext context = null)
+        /// <returns> The response returned from the service. </returns>
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMapping(string,RequestContext)']/*" />
+        public virtual Response GetSensorMapping(string sensorMappingId, RequestContext context)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
 
@@ -158,14 +195,23 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Deletes a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Deletes a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping resource. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
         /// <returns> The response returned from the service. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='DeleteAsync(String,RequestContext)']/*" />
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='DeleteAsync(string,RequestContext)']/*" />
         public virtual async Task<Response> DeleteAsync(string sensorMappingId, RequestContext context = null)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
@@ -184,14 +230,23 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Deletes a sensor mapping entity. </summary>
+        /// <summary>
+        /// [Protocol Method] Deletes a sensor mapping entity.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorMappingId"> Id of the sensor mapping resource. </param>
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="ArgumentNullException"> <paramref name="sensorMappingId"/> is null. </exception>
         /// <exception cref="ArgumentException"> <paramref name="sensorMappingId"/> is an empty string, and was expected to be non-empty. </exception>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
         /// <returns> The response returned from the service. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='Delete(String,RequestContext)']/*" />
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='Delete(string,RequestContext)']/*" />
         public virtual Response Delete(string sensorMappingId, RequestContext context = null)
         {
             Argument.AssertNotNullOrEmpty(sensorMappingId, nameof(sensorMappingId));
@@ -210,7 +265,16 @@ namespace Azure.Verticals.AgriFood.Farming
             }
         }
 
-        /// <summary> Returns a paginated list of sensor mapping resources. </summary>
+        /// <summary>
+        /// [Protocol Method] Returns a paginated list of sensor mapping resources.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorIds"> Id of the sensors. </param>
         /// <param name="sensorPartnerIds"> Id of the sensor partners. </param>
         /// <param name="partyIds"> Id of the parties. </param>
@@ -219,7 +283,7 @@ namespace Azure.Verticals.AgriFood.Farming
         /// <param name="names"> Names of the resource. </param>
         /// <param name="propertyFilters">
         /// Filters on key-value pairs within the Properties object.
-        /// eg. &quot;{testKey} eq {testValue}&quot;.
+        /// eg. "{testKey} eq {testValue}".
         /// </param>
         /// <param name="statuses"> Statuses of the resource. </param>
         /// <param name="minCreatedDateTime"> Minimum creation date of resource (inclusive). </param>
@@ -234,15 +298,24 @@ namespace Azure.Verticals.AgriFood.Farming
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
         /// <returns> The <see cref="AsyncPageable{T}"/> from the service containing a list of <see cref="BinaryData"/> objects. Details of the body schema for each item in the collection are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappingsAsync(IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,DateTimeOffset,DateTimeOffset,DateTimeOffset,DateTimeOffset,Int32,String,RequestContext)']/*" />
-        public virtual AsyncPageable<BinaryData> GetSensorMappingsAsync(IEnumerable<string> sensorIds = null, IEnumerable<string> sensorPartnerIds = null, IEnumerable<string> partyIds = null, IEnumerable<string> boundaryIds = null, IEnumerable<string> ids = null, IEnumerable<string> names = null, IEnumerable<string> propertyFilters = null, IEnumerable<string> statuses = null, DateTimeOffset? minCreatedDateTime = null, DateTimeOffset? maxCreatedDateTime = null, DateTimeOffset? minLastModifiedDateTime = null, DateTimeOffset? maxLastModifiedDateTime = null, int? maxPageSize = null, string skipToken = null, RequestContext context = null)
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappingsAsync(IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},DateTimeOffset?,DateTimeOffset?,DateTimeOffset?,DateTimeOffset?,int?,string,RequestContext)']/*" />
+        public virtual AsyncPageable<BinaryData> GetSensorMappingsAsync(IEnumerable<string> sensorIds, IEnumerable<string> sensorPartnerIds, IEnumerable<string> partyIds, IEnumerable<string> boundaryIds, IEnumerable<string> ids, IEnumerable<string> names, IEnumerable<string> propertyFilters, IEnumerable<string> statuses, DateTimeOffset? minCreatedDateTime, DateTimeOffset? maxCreatedDateTime, DateTimeOffset? minLastModifiedDateTime, DateTimeOffset? maxLastModifiedDateTime, int? maxPageSize, string skipToken, RequestContext context)
         {
             HttpMessage FirstPageRequest(int? pageSizeHint) => CreateGetSensorMappingsRequest(sensorIds, sensorPartnerIds, partyIds, boundaryIds, ids, names, propertyFilters, statuses, minCreatedDateTime, maxCreatedDateTime, minLastModifiedDateTime, maxLastModifiedDateTime, maxPageSize, skipToken, context);
             HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => CreateGetSensorMappingsNextPageRequest(nextLink, sensorIds, sensorPartnerIds, partyIds, boundaryIds, ids, names, propertyFilters, statuses, minCreatedDateTime, maxCreatedDateTime, minLastModifiedDateTime, maxLastModifiedDateTime, maxPageSize, skipToken, context);
-            return PageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, e => BinaryData.FromString(e.GetRawText()), ClientDiagnostics, _pipeline, "SensorMappings.GetSensorMappings", "value", "nextLink", context);
+            return GeneratorPageableHelpers.CreateAsyncPageable(FirstPageRequest, NextPageRequest, e => BinaryData.FromString(e.GetRawText()), ClientDiagnostics, _pipeline, "SensorMappings.GetSensorMappings", "value", "nextLink", context);
         }
 
-        /// <summary> Returns a paginated list of sensor mapping resources. </summary>
+        /// <summary>
+        /// [Protocol Method] Returns a paginated list of sensor mapping resources.
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// This <see href="https://github.com/Azure/azure-sdk-for-net/blob/main/sdk/core/Azure.Core/samples/ProtocolMethods.md">protocol method</see> allows explicit creation of the request and processing of the response for advanced scenarios.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// </summary>
         /// <param name="sensorIds"> Id of the sensors. </param>
         /// <param name="sensorPartnerIds"> Id of the sensor partners. </param>
         /// <param name="partyIds"> Id of the parties. </param>
@@ -251,7 +324,7 @@ namespace Azure.Verticals.AgriFood.Farming
         /// <param name="names"> Names of the resource. </param>
         /// <param name="propertyFilters">
         /// Filters on key-value pairs within the Properties object.
-        /// eg. &quot;{testKey} eq {testValue}&quot;.
+        /// eg. "{testKey} eq {testValue}".
         /// </param>
         /// <param name="statuses"> Statuses of the resource. </param>
         /// <param name="minCreatedDateTime"> Minimum creation date of resource (inclusive). </param>
@@ -266,12 +339,12 @@ namespace Azure.Verticals.AgriFood.Farming
         /// <param name="context"> The request context, which can override default behaviors of the client pipeline on a per-call basis. </param>
         /// <exception cref="RequestFailedException"> Service returned a non-success status code. </exception>
         /// <returns> The <see cref="Pageable{T}"/> from the service containing a list of <see cref="BinaryData"/> objects. Details of the body schema for each item in the collection are in the Remarks section below. </returns>
-        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappings(IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,IEnumerable,DateTimeOffset,DateTimeOffset,DateTimeOffset,DateTimeOffset,Int32,String,RequestContext)']/*" />
-        public virtual Pageable<BinaryData> GetSensorMappings(IEnumerable<string> sensorIds = null, IEnumerable<string> sensorPartnerIds = null, IEnumerable<string> partyIds = null, IEnumerable<string> boundaryIds = null, IEnumerable<string> ids = null, IEnumerable<string> names = null, IEnumerable<string> propertyFilters = null, IEnumerable<string> statuses = null, DateTimeOffset? minCreatedDateTime = null, DateTimeOffset? maxCreatedDateTime = null, DateTimeOffset? minLastModifiedDateTime = null, DateTimeOffset? maxLastModifiedDateTime = null, int? maxPageSize = null, string skipToken = null, RequestContext context = null)
+        /// <include file="Docs/SensorMappings.xml" path="doc/members/member[@name='GetSensorMappings(IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},IEnumerable{string},DateTimeOffset?,DateTimeOffset?,DateTimeOffset?,DateTimeOffset?,int?,string,RequestContext)']/*" />
+        public virtual Pageable<BinaryData> GetSensorMappings(IEnumerable<string> sensorIds, IEnumerable<string> sensorPartnerIds, IEnumerable<string> partyIds, IEnumerable<string> boundaryIds, IEnumerable<string> ids, IEnumerable<string> names, IEnumerable<string> propertyFilters, IEnumerable<string> statuses, DateTimeOffset? minCreatedDateTime, DateTimeOffset? maxCreatedDateTime, DateTimeOffset? minLastModifiedDateTime, DateTimeOffset? maxLastModifiedDateTime, int? maxPageSize, string skipToken, RequestContext context)
         {
             HttpMessage FirstPageRequest(int? pageSizeHint) => CreateGetSensorMappingsRequest(sensorIds, sensorPartnerIds, partyIds, boundaryIds, ids, names, propertyFilters, statuses, minCreatedDateTime, maxCreatedDateTime, minLastModifiedDateTime, maxLastModifiedDateTime, maxPageSize, skipToken, context);
             HttpMessage NextPageRequest(int? pageSizeHint, string nextLink) => CreateGetSensorMappingsNextPageRequest(nextLink, sensorIds, sensorPartnerIds, partyIds, boundaryIds, ids, names, propertyFilters, statuses, minCreatedDateTime, maxCreatedDateTime, minLastModifiedDateTime, maxLastModifiedDateTime, maxPageSize, skipToken, context);
-            return PageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, e => BinaryData.FromString(e.GetRawText()), ClientDiagnostics, _pipeline, "SensorMappings.GetSensorMappings", "value", "nextLink", context);
+            return GeneratorPageableHelpers.CreatePageable(FirstPageRequest, NextPageRequest, e => BinaryData.FromString(e.GetRawText()), ClientDiagnostics, _pipeline, "SensorMappings.GetSensorMappings", "value", "nextLink", context);
         }
 
         internal HttpMessage CreateGetSensorMappingsRequest(IEnumerable<string> sensorIds, IEnumerable<string> sensorPartnerIds, IEnumerable<string> partyIds, IEnumerable<string> boundaryIds, IEnumerable<string> ids, IEnumerable<string> names, IEnumerable<string> propertyFilters, IEnumerable<string> statuses, DateTimeOffset? minCreatedDateTime, DateTimeOffset? maxCreatedDateTime, DateTimeOffset? minLastModifiedDateTime, DateTimeOffset? maxLastModifiedDateTime, int? maxPageSize, string skipToken, RequestContext context)
@@ -282,56 +355,56 @@ namespace Azure.Verticals.AgriFood.Farming
             var uri = new RawRequestUriBuilder();
             uri.Reset(_endpoint);
             uri.AppendPath("/sensor-mappings", false);
-            if (sensorIds != null)
+            if (sensorIds != null && Optional.IsCollectionDefined(sensorIds))
             {
                 foreach (var param in sensorIds)
                 {
                     uri.AppendQuery("sensorIds", param, true);
                 }
             }
-            if (sensorPartnerIds != null)
+            if (sensorPartnerIds != null && Optional.IsCollectionDefined(sensorPartnerIds))
             {
                 foreach (var param in sensorPartnerIds)
                 {
                     uri.AppendQuery("sensorPartnerIds", param, true);
                 }
             }
-            if (partyIds != null)
+            if (partyIds != null && Optional.IsCollectionDefined(partyIds))
             {
                 foreach (var param in partyIds)
                 {
                     uri.AppendQuery("partyIds", param, true);
                 }
             }
-            if (boundaryIds != null)
+            if (boundaryIds != null && Optional.IsCollectionDefined(boundaryIds))
             {
                 foreach (var param in boundaryIds)
                 {
                     uri.AppendQuery("boundaryIds", param, true);
                 }
             }
-            if (ids != null)
+            if (ids != null && Optional.IsCollectionDefined(ids))
             {
                 foreach (var param in ids)
                 {
                     uri.AppendQuery("ids", param, true);
                 }
             }
-            if (names != null)
+            if (names != null && Optional.IsCollectionDefined(names))
             {
                 foreach (var param in names)
                 {
                     uri.AppendQuery("names", param, true);
                 }
             }
-            if (propertyFilters != null)
+            if (propertyFilters != null && Optional.IsCollectionDefined(propertyFilters))
             {
                 foreach (var param in propertyFilters)
                 {
                     uri.AppendQuery("propertyFilters", param, true);
                 }
             }
-            if (statuses != null)
+            if (statuses != null && Optional.IsCollectionDefined(statuses))
             {
                 foreach (var param in statuses)
                 {
